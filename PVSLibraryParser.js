@@ -94,21 +94,32 @@ class PVSLibraryParser {
     }
 
     getClipByName(name, callback) {
-        callback(this.playlist.find(node => node.plnName === name));
+        callback(null, this.playlist.find(node => node.plnName === name));
     }
 
     getClipByIndex(index, callback) {
-        callback(this.playlist[index]);
+        if (index === -1) {
+            // Get the last clip
+            callback(null, this.playlist[this.playlist.length - 1]);
+        } else if (index >= this.playlist.length ) {
+            // Get the first clip
+            console.log('get first clip')
+            callback(null, this.playlist[0]);
+        } else {
+            // Get the clip at the specified index
+            callback(null, this.playlist[index]);
+        }
     }
 
     selectClip(index) {
+        console.log("PVSLP: setting active index to:", index)
         this.playlist.forEach((node, idx) => {
             node.isSelected = (idx === index);
         });
     }
 
     getClipSelected(callback) {
-        callback(this.playlist.find(node => node.isSelected));
+        callback(null, this.playlist.find(node => node.isSelected));
     }
 }
 

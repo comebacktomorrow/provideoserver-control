@@ -75,12 +75,70 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
                 //     frameRate: frameRate,
                 //     trueFrameValue: trueFrameValue
                 // });
-                frames = trueFrameValue;
+                frames = Math.round(trueFrameValue);
             }
         }
     }
 
-    return { frames, seconds, minutes, hours };
+    return { timecode: {frames, seconds, minutes, hours }};
+}
+
+//Note we assume TC1 is the modifying timecode and TC2 is the track timecode
+function operateTimecodes(tc1, tc2, operation, frameRate = 0) {
+    let frames = 0, seconds, minutes, hours;
+
+
+    if (operation === 'add') {
+        frames = tc1.frames + tc2.frames;
+        seconds = tc1.seconds + tc2.seconds;
+        minutes = tc1.minutes + tc2.minutes;
+        hours = tc1.hours + tc2.hours;
+
+        if (frameRate > 0) {
+            seconds += Math.floor(frames / frameRate);
+            frames = frames % frameRate;
+        }
+
+        minutes += Math.floor(seconds / 60);
+        seconds = seconds % 60;
+
+        hours += Math.floor(minutes / 60);
+        minutes = minutes % 60;
+
+    } else if (operation === 'subtract') {
+        frames =  tc2.frames - tc1.frames;
+        seconds = tc2.seconds - tc1.seconds;
+        minutes = tc2.minutes - tc1.minutes;
+        hours = tc2.hours - tc1.hours;
+
+        if (frameRate > 0 && frames < 0) {
+            frames += frameRate;
+            seconds -= 1;
+        }
+
+        if (seconds < 0) {
+            seconds += 60;
+            minutes -= 1;
+        }
+
+        if (minutes < 0) {
+            minutes += 60;
+            hours -= 1;
+        }
+
+        if (hours < 0) {
+            throw new Error("Resulting timecode is negative");
+        }
+    } else {
+        throw new Error("Invalid operation. Use 'add' or 'subtract'.");
+    }
+
+    return {
+        frames: frames,
+        seconds: seconds,
+        minutes: minutes,
+        hours: hours
+    };
 }
 
 function unpackExtendedNameFormat(data) {
@@ -169,5 +227,6 @@ module.exports = {
     splitDataIntoPackets,
     unpackExtendedNameFormat,
     unpackRawTimecode,
-    packTimecode
+    packTimecode,
+    operateTimecodes
 };

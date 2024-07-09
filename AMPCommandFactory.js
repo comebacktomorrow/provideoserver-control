@@ -79,13 +79,13 @@ class InPresetCommand extends AMPCommandProto {
        //expects ack
     }
 
-    notifySuccess(response) {
-        console.log('Command executed successfully:', response);
-    };
+    // notifySuccess(response) {
+    //     console.log('Command executed successfully:', response);
+    // };
     
-    notifyFailure(error) {
-        console.error('Command execution failed:', error);
-    };
+    // notifyFailure(error) {
+    //     console.error('Command execution failed:', error);
+    // };
 }
 
 // 24.31 Cue Up with Data \ Timecode

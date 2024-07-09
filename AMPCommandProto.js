@@ -15,6 +15,11 @@ class AMPCommandProto {
 
         this.onSuccess(this.notifySuccess);
         this.onFailure(this.notifyFailure);
+
+        this.promise = new Promise((resolve, reject) => {
+            this.onSuccess(resolve);
+            this.onFailure(reject);
+        })
     }
 
     pack() {
@@ -58,7 +63,7 @@ class AMPCommandProto {
         console.log("-----Model. Recieved success response.", response)
         if (this.onSuccessCallback) {
             console.log('-----Model callback - notified command success. Giving control back to queue')
-            //this.onSuccessCallback(response);
+            this.onSuccessCallback(response);
         }
     }
 
@@ -66,7 +71,7 @@ class AMPCommandProto {
         console.log('-----Model. Recieved failure response.', response)
         if (this.onFailureCallback) {
             console.log('-----Model callback - notified command fail. Giving control back to queue')
-            //this.onFailureCallback(response);
+            this.onFailureCallback(response);
         }
     }
 

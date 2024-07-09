@@ -30,10 +30,13 @@ const rl = readline.createInterface({
 
 controller.CRAT({ channel: "Vtr1"});
 
-function handleCommand(command) {
+async function handleCommand(command) {
     switch (command.trim()) {
         case 'p':
             controller.play(); // Example: play with default time
+            break;
+        case 'h':
+            controller.pause(); // Example: play with default time
             break;
         case 'c':
             controller.CRAT({ channel: "Vtr1"}); // Example: play with default time
@@ -56,9 +59,9 @@ function handleCommand(command) {
         case 'a':
             controller.getAllClips((err, clips) => {
                 if (err) {
-                    console.error(err);
+                    console.error('err',err);
                 } else {
-                    console.log(clips);
+                    console.log('ok ',clips);
                 }
             });
             break;
@@ -83,9 +86,9 @@ function handleCommand(command) {
         case 'o':
             controller.getClipSelected((err, clips) => {
                 if (err) {
-                    console.error(err);
+                    console.error("err", err);
                 } else {
-                    console.log(clips);
+                    console.log("ok", clips);
                 }
             });
             break;
@@ -102,10 +105,28 @@ function handleCommand(command) {
             controller.loadClipByIndex(3);
         break;
         case 'u':
-            controller.getLoadedClipPlaylistData();
+            await controller.getLoadedClipPlaylistData( (err, clip) => {
+                if (err) {
+                    console.error("error", err);
+                } else {
+                    console.log("INDEX ok", clip);
+                }
+            });
         break;
         case '>':
             controller.queueNext();
+        break;
+        case '<':
+            controller.queuePrevious();
+        break;
+        case ']':
+            controller.jumpTime({timecode: { frames: 0, seconds: 15, minutes: 0, hours: 0 }, operation: 'add'});
+        break;
+        case '[':
+            controller.jumpTime({timecode: { frames: 0, seconds: 15, minutes: 0, hours: 0 }, operation: 'subtract'});
+        break;
+        case 'r':
+            controller.requeueClip();
         break;
         // case 'l':
         //     controller.listFirstRequest();

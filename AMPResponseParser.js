@@ -35,7 +35,7 @@ class AMPResponseParser {
                 break;
             case '8216':
                 console.log('RP: 82.16 extended name format')
-                response.data = unpackExtendedNameFormat(response.data);
+                response.data = { clipname: unpackExtendedNameFormat(response.data) };
                 break;
             case '8a14':
                 console.log('RP: 8A.14 extended name format')
