@@ -61,7 +61,7 @@ class AMPResponseParser {
         //     // Handle specific response types
         // }
 
-        console.log("RP sending: " + JSON.stringify(response))
+        console.log("-----RP sending: " + JSON.stringify(response))
         return response;
     }
 }

@@ -43,11 +43,11 @@ class AMPCommandQueue {
         }
 
         if (response.isValidChecksum || response.responseType === 'ACK') {
-            console.log('----Valid checksum or simple response in response:');
+            console.log('----Queue: Valid checksum or simple response in response:');
 
             if (response.responseType === 'ACK') {
-                console.log('----Queue - Acknowledgement received. Calling back model');
-                this.currentCommand.notifySuccess();
+                console.log('----Queue - Acknowledgement received. Calling back model', 'ACK');
+                this.currentCommand.notifySuccess(response);
             } else if (response.responseType === 'NAC') {
                 console.error('----Queue - Negative Acknowledgement received. Calling back model');
                 this.currentCommand.notifyFailure();

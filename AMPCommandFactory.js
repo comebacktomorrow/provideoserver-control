@@ -185,6 +185,7 @@ class IDLoadedRequestCommand extends AMPCommandProto {
 
         this.expectedResponse = '8216';
         this.expectedDataType = 'extendedNameFormat';
+
     }
 }
 
