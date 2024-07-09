@@ -66,6 +66,7 @@ class AMPCommandQueue {
         this.isProcessing = false;
         this.currentCommand = null;
         this.processNext();
+        return response;
     }
 
 }

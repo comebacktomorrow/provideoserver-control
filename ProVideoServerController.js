@@ -41,7 +41,9 @@ class ProVideoServerController {
             console.log('---Complex response received by controller -> passing to queue');
         }
         // Handle all responses in the command queue
-        this.commandQueue.handleResponse(response);
+        let x = this.commandQueue.handleResponse(response);
+        console.log("XXXXXXXXXX", x)
+        return x;
     }
 
     loadClipByIndex(index) {
@@ -101,15 +103,18 @@ class ProVideoServerController {
     inPreset(data) {
         console.log("Controller calling inPreset")
         const command = AMPCommandFactory.createCommand('inPreset', data, this.tcpClient);
+        let y = ''
 
         command.onSuccess((data) => {
             console.log('------Controller - InPreset command succeeded', data);
+            y = data;
         });
 
         command.onFailure(() => {
             console.log('------Controller - InPreset command failed');
         });
         this.commandQueue.addCommand(command);
+        console.log('YYYYYYYYYYY', y)
     }
 
     play(data) {
@@ -133,13 +138,15 @@ class ProVideoServerController {
 
     IDLoadedRequest(){
         const command = AMPCommandFactory.createCommand('idLoadedRequest', {}, this.tcpClient);
+        let r = '';
 
-        command.onSuccess(() => {
-            console.log('------Controller - IDLoadedRequest command succeeded');
+        command.onSuccess((response) => {
+            console.log('------Controller - IDLoadedRequest command succeeded', response);
+            //this.handleIDLoadedResponse(response)
         });
 
-        command.onFailure(() => {
-            console.log('------Controller - IDLoadedRequest command failed');
+        command.onFailure((response) => {
+            console.log('------Controller - IDLoadedRequest command failed', response);
         });
         this.commandQueue.addCommand(command);
     }

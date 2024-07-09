@@ -12,6 +12,9 @@ class AMPCommandProto {
         this.expectedResponse = 'ACK';
         this.expectedDataType = 'ack';
         this.skipCheckSum = skipchecksum;
+
+        this.onSuccess(this.notifySuccess);
+        this.onFailure(this.notifyFailure);
     }
 
     pack() {
@@ -32,13 +35,14 @@ class AMPCommandProto {
         this.tcpClient.sendData(this.pack());
     }
 
-    handleResponse(response) {
-        if (response === this.expectedResponse) {
-            this.notifySuccess(response);
-        } else {
-            this.notifyFailure(response);
-        }
-    }
+    // handleResponse(response) {
+    //     console.log("Model handling response:", response);
+    //     if (response === this.expectedResponse) {
+    //         this.notifySuccess(response);
+    //     } else {
+    //         this.notifyFailure(response);
+    //     }
+    // }
 
     onSuccess(callback) {
         console.log('model - init success callback')
@@ -51,18 +55,18 @@ class AMPCommandProto {
     }
 
     notifySuccess(response) {
-        console.log("-----Model. Recieved callback from queue.")
+        console.log("-----Model. Recieved success response.", response)
         if (this.onSuccessCallback) {
-            console.log('-----Model callback - notified command success')
-            this.onSuccessCallback(response);
+            console.log('-----Model callback - notified command success. Giving control back to queue')
+            //this.onSuccessCallback(response);
         }
     }
 
     notifyFailure(response) {
-        console.log('-----Model. Recieved callback from queue.')
+        console.log('-----Model. Recieved failure response.', response)
         if (this.onFailureCallback) {
-            console.log('-----Model callback - notified command fail')
-            this.onFailureCallback(response);
+            console.log('-----Model callback - notified command fail. Giving control back to queue')
+            //this.onFailureCallback(response);
         }
     }
 
