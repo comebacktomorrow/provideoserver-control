@@ -16,6 +16,7 @@ class ProVideoServerController {
         this.currentClip = { plnName: ""}; // State for current clip
         this.previousClip = null; // Previous state for clip
         this.currentTime = null; // State for current time
+        this.clocks = [];
         this.previousTime = null; // Previous state for time
         this.transportState = 'STOPPED'; // Initialize transport state
 
@@ -40,11 +41,13 @@ class ProVideoServerController {
         });
     }
 
+    //roughy works
     //still need to convert T1 \ T2 \ TRT to timecode - actually need quite a bit more work
+    
+    
+    
+    
     //need set and clear trt functions
-    
-    
-    
     //need to deal with playlist updates
 
     //jumpBack function - done
@@ -95,25 +98,36 @@ class ProVideoServerController {
 
     async updateCurrentTimecode() {
         try {
+            console.log("UPDATE TIMECODE!")
             const data = await this.currentTimeSense();
             this.currentTimecode = data.data.timecode;
             this.currentTime = data.data.timecode;
+            this.clocks.currentTimecode = data.data.timecode;
+            this.clocks.t1 = operateTimecodes(data.data.timecode, this.currentClip.t1,'subtract' , this.currentClip.fps)
+            this.clocks.t2 = operateTimecodes(data.data.timecode, this.currentClip.t2,'subtract' , this.currentClip.fps)
+            this.clocks.trt = operateTimecodes(data.data.timecode, this.currentClip.trt,'subtract' , this.currentClip.fps)
+            console.log("CLIP *******************************************",this.currentClip);
+            console.log("TC NOW", this.currentTimecode);
+            console.log("UPDATE TIMECODE : T1 ", this.clocks.t1);
+            console.log("UPDATE TIMECODE : T2 ", this.clocks.t2);
+            console.log("UPDATE TIMECODE : T2 ", this.clocks.trt);
+            //console.log("UPDATE TIMECODE : TRK ", this.clocks.t1);
         } catch (error) {
             console.error('Error updating current timecode:', error);
         }
     }
 
     updateTransportState() {
-        console.log("TC *******************************************",this.currentTimecode);
+        //console.log("TC NOW", this.currentTimecode);
         let framerate = + this.currentClip.fps;
         console.log(framerate);
-        let jumptime = {timecode: { frames: 2, seconds: 0, minutes: 0, hours: 0 }, operation: 'subtract'}
+        let jumptime = {timecode: { frames: 2, seconds: 0, minutes: 0, hours: 0 }, operation: 'subtract'} // we use this to create a tollerance
         let jumptc = operateTimecodes(jumptime.timecode,  this.currentClip.duration, jumptime.operation, framerate )
-        console.log("END  *******************************************",jumptc);
+        //console.log("END  TC", jumptc); //this is the time that we'll call end clip
         if (!this.currentClip || !this.currentTimecode) return;
 
         const { hours, minutes, seconds, frames } = this.currentTimecode;
-        console.log("TC *******************************************",this.currentClip);
+        //console.log("TC *******************************************",this.currentClip); // this shouldn't be the whole object
         if (hours === 0 && minutes === 0 && seconds === 0 && (frames === 0 || frames === 1)) {
             this.transportState = 'AT_START';
             this.clearAutoCueTimer();
