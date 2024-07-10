@@ -1,11 +1,13 @@
 // utilities.js
+const logger = require('./logger');
+
 function calculateChecksum(data) {
     let sum = 0;
     for (let i = 0; i < data.length; i += 2) {
         sum += parseInt(data.substr(i, 2), 16);
     }
     const checksum = (sum & 0xFF).toString(16).padStart(2, '0').toUpperCase();
-    console.log("Calculated checksum: on " + data +" as "+ checksum);
+    //console.log("Calculated checksum: on " + data +" as "+ checksum);
     return checksum;
 }
 
@@ -28,7 +30,7 @@ const asNameFormat = (data, bytes = 8) => {
 const asExtendedNameFormat = (data, timecode = "") => {
     const dataAsHex = Buffer.from(data).toString('hex');
     let bcValue = (dataAsHex.length / 2).toString(16).padStart(4, '0');
-    console.log('extended name as ', bcValue)
+    logger.raw('extended name as ', bcValue)
     return bcValue + dataAsHex;
 };
 
@@ -77,7 +79,7 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
 
             if (frames >= minFrameValue && frames <= maxFrameValue) {
                 const trueFrameValue = frames - minFrameValue;
-                console.log({
+                logger.verbose({
                     frameRate: frameRate,
                     trueFrameValue: trueFrameValue
                 });

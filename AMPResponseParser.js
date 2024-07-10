@@ -1,5 +1,6 @@
 //AMPResponseParser.js
 const { unpackRawTimecode, unpackExtendedNameFormat } = require('./utilities');
+const logger = require('./logger');
 class AMPResponseParser {
     static parse(responseData, expectedData) {
         const response = {};
@@ -30,15 +31,15 @@ class AMPResponseParser {
                 }
                 break;
             case '7404':
-                console.log('RP: 74.04 Handle timecode', response.data);
+                logger.verbose('Response Parser: 74.04 Handle timecode', response.data);
                 response.data = unpackRawTimecode(response.data); //we also need a unpack messy timecode as well
                 break;
             case '8216':
-                console.log('RP: 82.16 extended name format')
+                logger.verbose('Response Parser: 82.16 extended name format')
                 response.data = { clipname: unpackExtendedNameFormat(response.data) };
                 break;
             case '8a14':
-                console.log('RP: 8A.14 extended name format')
+                logger.verbose('Response Parser: 8A.14 extended name format')
                 if (response.combinedCode == '8014') {
                     //no clips to return
                 } else if (response.combinedCode == '8a14') {
@@ -47,7 +48,7 @@ class AMPResponseParser {
                 }
                 break;
             default:
-                console.log('RP: No method for parsing data response code');
+                logger.warn('RP: No method for parsing data response code');
         }
             
         
@@ -61,7 +62,7 @@ class AMPResponseParser {
         //     // Handle specific response types
         // }
 
-        console.log("-----RP sending: " + JSON.stringify(response))
+        //logger.verbose("-----Response Parser: Sendig " + JSON.stringify(response))
         return response;
     }
 }

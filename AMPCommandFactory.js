@@ -1,12 +1,13 @@
 // AMPCommandFactory.js
 const { calculateLength, packTimecode, asExtendedNameFormat, byteCountHeader } = require('./utilities');
 const AMPCommandProto = require('./AMPCommandProto');
+const logger = require('./logger');
 
 
 class CRATCommand extends AMPCommandProto {
     constructor(data = {}, tcpClient) {
         let cmdData = '';
-        console.log("Calling CRAT. Connection to " + data)
+        logger.verbose("Calling CRAT. Connection to " + data)
 
         if (data && data.channel) {
             cmdData = data.channel;
@@ -20,7 +21,7 @@ class CRATCommand extends AMPCommandProto {
 //
 class StopCommand extends AMPCommandProto {
     constructor(tcpClient) {
-        console.log("Calling stop")
+        logger.verbose("Calling stop")
         super('CMDS', '20', '00', tcpClient);
 
         //expects ACK
@@ -30,7 +31,7 @@ class StopCommand extends AMPCommandProto {
 //PVS AKS's it, but it doesn't do anything
 class EjectCommand extends AMPCommandProto {
     constructor(tcpClient) {
-        console.log("Calling eject")
+        logger.verbose("Calling eject")
         super('CMDS', '20', '0F', tcpClient);
 
         //expects ack
@@ -52,11 +53,11 @@ class PlayCommand extends AMPCommandProto {
         if (data.timecode != "00000000") {
             byteCount = '4';
             cmdData = data.timecode;
-            console.log("Playing from " + cmdData)
+            logger.verbose("Playing from " + cmdData)
         }
 
         const fullCmdCode = byteCount + cmdCode;
-        console.log("Calling play")
+        logger.verbose("Calling play")
         super('CMDS', cmdType, fullCmdCode, tcpClient, cmdData);
 
         //expects ack
@@ -69,7 +70,7 @@ class PlayCommand extends AMPCommandProto {
 // We use this to load up new media
 class InPresetCommand extends AMPCommandProto {
     constructor(data = {clipname: false}, tcpClient) {
-        console.log("Calling InPreset for clip " , data)
+        logger.verbose("Calling InPreset for clip " , data)
        super('CMDS', '4A', '14', tcpClient, byteCountHeader(asExtendedNameFormat(data.clipname)), true); //works
        //super('CMDS', '40', '14', tcpClient, '00000000'); // this is the incorrect command but essentially works
        //super('CMDS', '44', '14', tcpClient, '00010100');
@@ -94,7 +95,7 @@ class InPresetCommand extends AMPCommandProto {
 // We use this to cue up timecode
 class CueUpCommand extends AMPCommandProto {
     constructor(data = {timecode: false, clipname: false}, tcpClient) {
-        console.log("Calling Cue Up")
+        logger.verbose("Calling Cue Up")
         const cmdType = '2'; //2X - X is cmddata byte count 0 if no timecode data, 4 is includes timecode data
         let cmdCode = '31';
         let cmdData = '';
@@ -102,32 +103,32 @@ class CueUpCommand extends AMPCommandProto {
 
         // if we have neither timecode or clip name
         if (!data.timecode && !data.clipname ){
-            console.log('CUE: No name or timecode')
+            logger.verbose('CUE: No name or timecode')
             byteCount = 0;
             // callinga 20.31
 
             //if we have timecode only
         }  else if (data.timecode && !data.clipname ) {
-            console.log('CUE:Timecode only')
+            logger.verbose('CUE:Timecode only')
             byteCount = 4;
             cmdData = packTimecode(data.timecode);
             
             // we  have a clip name only
         } else if (!data.timecode && data.clipname) {
-            console.log('CUE: Name only')
+            logger.verbose('CUE: Name only')
             byteCount = 8;
             cmdData = data.clipname; // we need to insert a function to convvert the clip name
 
             //if we have both timecode and clip name
         } else if (data.timecode  && data.clipname ) {
-            console.log('CUE: Both name and timecode')
+            logger.verbose('CUE: Both name and timecode')
             byteCount = 'C';
             cmdData = packTimecode(data.timecode) + data.clipname;
         }
 
 
         const fullCmdCode = byteCount + cmdCode;
-        console.log("Calling fast forward type " + data.mode)
+        logger.verbose("Calling fast forward type " + data.mode)
         super('CMDS', cmdType, fullCmdCode, tcpClient, cmdData, true);
     }
 }
@@ -147,7 +148,7 @@ class IDCountRequestCommand extends AMPCommandProto {
 // Returns 80.14 if no clips are returned
 class ListFirstIDCommand extends AMPCommandProto {
     constructor(tcpClient) {
-        console.log("Playlist: requesting first clip")
+        logger.verbose("Playlist: requesting first clip")
         super('CMDS', 'A2', '14', tcpClient, '00');
 
         this.expectedResponse = '8a14';
@@ -164,7 +165,7 @@ class ListNextIDCommand extends AMPCommandProto {
         let clips = '';
 
         if (data && data.clipreq) {
-            consolelog('clipreq is ' + data.clipreq)
+            logger.verbose('clipreq is ' + data.clipreq)
             clips = data.clipreq
         } 
 
@@ -179,7 +180,7 @@ class ListNextIDCommand extends AMPCommandProto {
 //Return 82.1X (80.16 means no clip) in extended format - Works
 class IDLoadedRequestCommand extends AMPCommandProto {
     constructor(tcpClient) {
-        console.log("Playlist: requesting current clip")
+        logger.verbose("Playlist: requesting current clip")
 
         super('CMDS', 'A0', '16', tcpClient);
 
@@ -203,7 +204,7 @@ class DeviceNameRequestCommand extends AMPCommandProto {
 // Current Time Sense - works in channeled CRAT mode and single channel mode
 class CurrentTimeSenseCommand extends AMPCommandProto {
     constructor(tcpClient) {
-        console.log("Current time sense")
+        logger.verbose("Current time sense")
         super('CMDS', '61', '0C', tcpClient, '01');
         
         this.expectedResponse = '7404';
@@ -216,7 +217,7 @@ class CurrentTimeSenseCommand extends AMPCommandProto {
         const charLength = calculateLength(this.cmdType + this.cmdCode + this.data, 4);
         let dataPack = this.cmdWrap + charLength + this.cmdType + this.cmdCode + this.data;
         //const checksum = calculateChecksum(this.cmdType + this.cmdCode + this.data);
-        console.log("packed as " + "WRAP " + this.cmdWrap + " BC " + charLength + " TYPE " + this.cmdType + " CODE " +this.cmdCode + " DATA " + this.data )
+        logger.verbose("packed as " + "WRAP " + this.cmdWrap + " BC " + charLength + " TYPE " + this.cmdType + " CODE " +this.cmdCode + " DATA " + this.data )
         //dataPack += checksum;
         return dataPack;
     }

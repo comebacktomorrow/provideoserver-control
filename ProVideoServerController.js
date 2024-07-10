@@ -3,6 +3,7 @@ const AMPCommandFactory = require('./AMPCommandFactory');
 const AMPCommandQueue = require('./AMPCommandQueue');
 const PVSLibraryParser = require('./PVSLibraryParser');
 const TCPClient = require('./TCPClient');
+const logger = require('./logger');
 const { operateTimecodes, timecodeToFrames } = require('./utilities');
 
 class ProVideoServerController {
@@ -62,8 +63,10 @@ class ProVideoServerController {
                 await this.updateLoadedClipPlaylistData();
                 await this.updateCurrentTimecode();
                 this.updateTransportState();
+                let header = "CTRL: POLL -  ";
+                logger.info(header +  this.getTransportState()  + ' of '+this.currentClip.duration )
             } catch (error) {
-                console.error('Error during polling:', error);
+                logger.warn('Error during polling:', error);
             }
         }, 1000); // Adjust the interval as needed
     }
@@ -76,14 +79,14 @@ class ProVideoServerController {
         try {
             const data = await this.IDLoadedRequest();
             if (data.data.clipname[0] != this.currentClip.plnName){
-                console.log("******************************************POLL: Clip name changed")
+                logger.debug("CTRL: POLL - IDLoadRequest mismatch - a different clip has been loaded")
                 //this.currentClip = await this.getClipByName(data.data.clipname[0], (err, clip));
                 this.getClipByName(data.data.clipname[0], (err, clip) => {
                             if (err) {
                                 console.error("error", err);
                                 reject(err);
                             } else {
-                                console.log("gLCPD updating loaded clip clip:", clip);
+                                //logger.debug("gLCPD updating loaded clip clip:", clip);
                                 this.currentClip = clip;
                                 //this.currentClipObj = data.data;
                                 this.setClipSelected(clip.index);
@@ -92,13 +95,13 @@ class ProVideoServerController {
                 //this.setClipSelected(this.currentClip.index);
             }
         } catch (error) {
-            console.error('Error updating loaded clip playlist data:', error);
+            logger.error('Error updating loaded clip playlist data:', error);
         }
     }
 
     async updateCurrentTimecode() {
         try {
-            console.log("UPDATE TIMECODE!")
+            //logger.debug("UPDATE TIMECODE!")
             const data = await this.currentTimeSense();
             this.currentTimecode = data.data.timecode;
             this.currentTime = data.data.timecode;
@@ -106,21 +109,21 @@ class ProVideoServerController {
             this.clocks.t1 = operateTimecodes(data.data.timecode, this.currentClip.t1,'subtract' , this.currentClip.fps)
             this.clocks.t2 = operateTimecodes(data.data.timecode, this.currentClip.t2,'subtract' , this.currentClip.fps)
             this.clocks.trt = operateTimecodes(data.data.timecode, this.currentClip.trt,'subtract' , this.currentClip.fps)
-            console.log("CLIP *******************************************",this.currentClip);
-            console.log("TC NOW", this.currentTimecode);
-            console.log("UPDATE TIMECODE : T1 ", this.clocks.t1);
-            console.log("UPDATE TIMECODE : T2 ", this.clocks.t2);
-            console.log("UPDATE TIMECODE : T2 ", this.clocks.trt);
+            //console.log("CLIP *******************************************",this.currentClip);
+            //console.log("TC NOW", this.currentTimecode);
+            //console.log("UPDATE TIMECODE : T1 ", this.clocks.t1);
+            //console.log("UPDATE TIMECODE : T2 ", this.clocks.t2);
+            //console.log("UPDATE TIMECODE : T2 ", this.clocks.trt);
             //console.log("UPDATE TIMECODE : TRK ", this.clocks.t1);
         } catch (error) {
-            console.error('Error updating current timecode:', error);
+            logger.error('Error updating current timecode:', error);
         }
     }
 
     updateTransportState() {
         //console.log("TC NOW", this.currentTimecode);
         let framerate = + this.currentClip.fps;
-        console.log(framerate);
+        //console.log(framerate);
         let jumptime = {timecode: { frames: 2, seconds: 0, minutes: 0, hours: 0 }, operation: 'subtract'} // we use this to create a tollerance
         let jumptc = operateTimecodes(jumptime.timecode,  this.currentClip.duration, jumptime.operation, framerate )
         //console.log("END  TC", jumptc); //this is the time that we'll call end clip
@@ -147,7 +150,7 @@ class ProVideoServerController {
         } else {
             
             let progress = ((timecodeToFrames(this.currentTimecode, framerate)/ timecodeToFrames(this.currentClip.duration, framerate)));
-            console.log("PROGRESS", progress)
+            //console.log("CTRL: PLAYBACK PROGRESS - ", progress)
             // this is our soft stop function - if we're within 0.1% of the end, we'll treat it as a stop
             if  ((progress) >= 0.99){
                 this.transportState = 'AT_END';
@@ -161,7 +164,7 @@ class ProVideoServerController {
 
             
         }
-        console.log("TRANSPOT:", this.transportState)
+        logger.debug("CTRL: updateTransportState - Transport State: " + this.transportState)
     }
 
     clearAutoCueTimer(){
@@ -173,9 +176,12 @@ class ProVideoServerController {
 
     setAutoCueTimer() {
         console.log("SET TIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERR")
+        logger.debug("CTRL: AUTOCUE - Timer has been set")
         this.autoCueTimer = setTimeout(() => {
             if (this.transportState === 'AT_END') {
                 console.log("AutoCue time out - going to next");
+            if (this.transportState === 'AT_END' && !this.autoCueDisable) {
+                logger.debug("CTRL: AUTOCUE - AutoCue time out - queueing next clip");
                 this.queueNext();
                 clearTimeout(this.autoCueTimer);
             }
@@ -207,24 +213,24 @@ class ProVideoServerController {
     }
 
     handleResponse(response) {
-        console.log('---Controller: processing response');
+        //logger.verbose('---Controller: processing response');
         if (response.responseType) {
             switch (response.responseType) {
                 case 'ACK':
-                    console.log('---Acknowledgement received by controller -> passing to queue ');
+                    logger.verbose('---Acknowledgement received by controller -> passing to queue ');
                     break;
                 case 'NAC':
-                    console.log('---Negative Acknowledgement received by controller -> passing to queue');
+                    logger.verbose('---Negative Acknowledgement received by controller -> passing to queue');
                     break;
                 case 'ERR':
-                    console.log('---Error received by controller -> passing to queue');
+                    logger.verbose('---Error received by controller -> passing to queue');
                     break;
                 default:
-                    console.error('---Unknown response type -> passing to queue');
+                    logger.error('---Unknown response type -> passing to queue');
             }
         } else {
             // Log complex responses
-            console.log('---Complex response received by controller -> passing to queue');
+            logger.verbose('---Complex response received by controller -> passing to queue');
         }
         // Handle all responses in the command queue
         return this.commandQueue.handleResponse(response);
@@ -232,21 +238,21 @@ class ProVideoServerController {
     }
     
     async loadClipByIndex(index) {
-        console.log(`CTRL: Called load clip by index ${index}`);
+        logger.verbose(`CTRL: Called loadClipByIndex — ${index}`);
         return new Promise((resolve, reject) => {
             this.getClipByIndex(index, (err, clip) => {
                 if (err) {
-                    console.error('Error getting clip by index:', err);
+                    logger.error('CTRL: loadClipByIndex - Error getting clip by index:', err);
                     reject(err);
                 } else if (clip) {
-                    console.log(`Loading clip: ${clip.plnName}`);
+                    logger.verbose(`CTRL: LoadClipByIndex success - Loading Clip ${clip.plnName}`);
                     this.inPreset({ clipname: clip.plnName })
                         .then(response => {
-                            console.log(`Clip loaded successfully: ${clip.plnName}`);
+                            logger.debug(`CTRL: OK. LoadClipByIndex — clip successfully: ${clip.plnName}`);
                             resolve(response);
                         })
                         .catch(error => {
-                            console.error('Error in loadClipByIndex:', error);
+                            logger.error('CTRL: loadClipByIndex -  Error in inPreset:', error);
                             reject(error);
                         });
                 } else {
@@ -257,21 +263,21 @@ class ProVideoServerController {
     }
 
     async loadClipByName(name) {
-        console.log(`CTRL: Called load clip by index ${name}`);
+        logger.verbose(`CTRL: Called loadClipByName ${name}`);
         return new Promise((resolve, reject) => {
             this.getClipByName(name, (err, clip) => {
                 if (err) {
-                    console.error('Error getting clip by name:', err);
+                    logger.error('CTRL: loadClipByName - Error getting clip by name:', err);
                     reject(err);
                 } else if (clip) {
-                    console.log(`Loading clip: ${clip.plnName}`);
+                    logger.verbose(`CTRL: loadClipByName - Got name. Loading clip: ${clip.plnName}`);
                     this.inPreset({ clipname: clip.plnName })
                         .then(response => {
-                            console.log(`Clip loaded successfully: ${clip.plnName}`);
+                            logger.debug(`CTRL: OK. LoadClipByName — clip successfully: ${clip.plnName}`);
                             resolve(response);
                         })
                         .catch(error => {
-                            console.error('Error in loadClipByIndex:', error);
+                           logger.error('CTRL: loadClipByName - Error in inPreset:', error);
                             reject(error);
                         });
                 } else {
@@ -282,25 +288,25 @@ class ProVideoServerController {
     }
 
     async loadClipByCleanName(name) {
-        console.log(`CTRL: Called load clip by index ${name}`);
+        logger.verbose(`CTRL: Called loadClipByCleanName ${name}`);
         return new Promise((resolve, reject) => {
             this.getClipByCleanName(name, (err, clip) => {
                 if (err) {
-                    console.error('Error getting clip by name:', err);
+                    logger.error('CTRL: loadClipByCleanName - Error getting clip by cleanName:', err);
                     reject(err);
                 } else if (clip) {
-                    console.log(`Loading clip: ${clip.plnName}`);
+                    logger.verbose(`CTRL: loadClipByCleanName found real name. Loading clip: ${clip.plnName}`);
                     this.inPreset({ clipname: clip.plnName })
                         .then(response => {
-                            console.log(`Clip loaded successfully: ${clip.plnName}`);
+                            logger.debug(`CTRL: loadClipByCleanNameClip loaded successfully: ${clip.plnName}`);
                             resolve(response);
                         })
                         .catch(error => {
-                            console.error('Error in loadClipByIndex:', error);
+                            console.error('CTRL: loadClipByCleanName - Error in inPreset:', error);
                             reject(error);
                         });
                 } else {
-                    reject(new Error('Clip not found'));
+                    reject(new Error('CTRL: loadClipByCleanName - Error getting clip by cleanName:'));
                 }
             });
         });
@@ -308,24 +314,24 @@ class ProVideoServerController {
 
     // possibly should be called updateLoadedClip
     getLoadedClipPlaylistData() {
-        console.log("CTRL: Called get details for active clip on timeline");
+        logger.verbose("CTRL: getLoadedClipPlaylistData. Get details for loaded clip");
         return new Promise((resolve, reject) => {
             this.IDLoadedRequest()
                 .then(data => {
-                    console.log('lookup', data.data.clipname); // IDLoadedRequest should return data here
+                    logger.verbose('CTRL: getLoadedClipPlaylistData - Called IDLoadRequest. Returned:', data.data.clipname); // IDLoadedRequest should return data here
                     this.getClipByName(data.data.clipname[0], (err, clip) => {
                         if (err) {
-                            console.error("error", err);
+                            logger.error('CTRL: getLoadedClipPlaylistData - Error getting clip by name:', err);
                             reject(err);
                         } else {
-                            console.log("gLCPD found clip:", clip);
+                            logger.debug("CTRL: getLoadedClipPlaylistData - Found data for clip:", clip);
                             this.setClipSelected(clip.index);
                             resolve(clip);
                         }
                     });
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    logger.error('CTRL: getLoadedClipPlaylistData - Called IDLoadRequest. Failed:', error);
                     reject(error);
                 });
         });
@@ -335,15 +341,15 @@ class ProVideoServerController {
     pause(){
         this.currentTimeSense()
             .then(data => {
-                console.log(" pausing at ", data.data.timecode)
+                logger.debug(" CTRL: Pause - pausing at ", data.data.timecode)
                 this.cueUpData({timecode: data.data.timecode})
                     .then(data => {
-                        console.log(" set timecode to ", data.data)
+                        logger.debug(" CTRL: Pause - CueUpWithData timecode to ", data.data);
                     })
                     .catch (error => { console.error('Error:', error);  })
             })
         .catch (error => {
-            console.error('Error:', error);
+            logger.error('CTRL: Pause -:', error);
         });
     }
 
@@ -353,22 +359,22 @@ class ProVideoServerController {
     jumpTime(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
         this.currentTimeSense()
             .then(data => {
-                console.log(" jumping at ", jumptime)
-
-                console.log("jc",jumptime.timecode, " tc",  data.data.timecode)
+                //console.log(" jumping at ", jumptime)
+                let ts = this.transportState;
+                logger.verbose("CTRL: jumpTime — Jumping ",jumptime.timecode, " from timecdoe ",  data.data.timecode)
                 let tc = operateTimecodes(jumptime.timecode, data.data.timecode, jumptime.operation )
-                console.log('new timecode ', tc)
+                logger.verbose('CTRL: jumpTime -  New timecode is  ', tc)
                 this.cueUpData({timecode: tc})
                     .then(data => {
-                        console.log(" set timecode to ", tc)
+                        logger.debug("CTRL: jumpTime - Jump Success! Set timecode to ", tc, ts)
                         if (ts == "PLAYING"){
                             this.play();
                     }
                     })
-                    .catch (error => { console.error('Error:', error);  })
+                    .catch (error => { logger.error('JumpTime: Cue Up with Data error', error);  })
             })
         .catch (error => {
-            console.error('Error:', error);
+            console.error('CTRL: jumpTime currentTimeSenseError. Error:', error);
         });
     }
 
@@ -378,41 +384,41 @@ class ProVideoServerController {
                 let ts = this.transportState;
                 this.cueUpData({timecode: tc})
                     .then(data => {
-                        console.log("JUMPING BACK TO TIMECODE ", tc, ts)
+                        logger.debug("CTRL: jumpBack - Jump Back Success! Set timecode to ", tc, ts)
                         if (ts == "PLAYING"){
                                 this.play();
                         }
                     })
-                    .catch (error => { console.error('Error:', error);  })
+                    .catch (error => { console.error('JumpTime: Cue Up with Data error:', error);  })
     }
 
     
 
 
     async requeueClip() {
-        console.log("CTRL: Called requeue clip");
+        logger.verbose("CTRL: requeueClip - called");
         try {
             const originalClip = await this.getLoadedClipPlaylistData();
-            console.log(`Original clip loaded:`, originalClip);
+            logger.verbose(`CTRL: requeueClip - Receieved getLoadedClipPlayListData:`, originalClip);
     
             if (!originalClip || !originalClip.plnName) {
-                throw new Error('Original clip data is not valid');
+                throw new Error('CTRL: requeueClip - getLoadedClipPlaylistData: Original clip data is not valid');
             }
     
-            console.log(`Queueing next clip after original clip: ${originalClip.plnName}`);
+            logger.verbose(`CTRL: requeueClip - Queueing next clip after original clip: ${originalClip.plnName}`);
             await this.queueNext();
     
-            console.log(`Next clip queued. Now reloading original clip: ${originalClip.plnName}`);
+            logger.verbose(`CTRL: requeueClip - Next clip queued called. Now reloading original clip via inPreset: ${originalClip.plnName}`);
             await this.inPreset({ clipname: originalClip.plnName });
     
-            console.log(`Original clip ${originalClip.plnName} requeued.`);
+            logger.debug(`CTRL: requeueClip - Original clip ${originalClip.plnName} requeued.`);
         } catch (error) {
             console.error('Error requeuing clip:', error);
         }
     }
 
     queueNext() {
-        console.log("CTRL: Called queue next clip");
+        logger.debug("CTRL: queueNext called");
         return new Promise((resolve, reject) => {
             this.getClipSelected((err, clips) => {
                 if (err) {
@@ -430,7 +436,7 @@ class ProVideoServerController {
     }
 
     queuePrevious() {
-        console.log("CTRL: Called queue next clip");
+        logger.debug("CTRL: queuePrevious called");
         return new Promise((resolve, reject) => {
             this.getClipSelected((err, clips) => {
                 if (err) {
@@ -454,10 +460,10 @@ class ProVideoServerController {
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            console.log('------Controller - cueUpData command succeeded', response);
+            logger.debug('------CTRL: cueUpData - command succeeded', data, response);
             return response;
         } catch(error) {
-                console.log('------Controller - cueUpData command failed', error);
+                logger.error('------CTRL: cueUpData - command failed', error);
                 throw error;
             };
     }
@@ -467,55 +473,54 @@ class ProVideoServerController {
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            console.log('------Controller - CRAT command succeeded', response);
+            logger.verbose('------CTRL: CRAT - command succeeded', CHANNEL_NAME, response);
             return response;
         } catch(error) {
-                console.log('------Controller - CRAT command failed', error);
+                logger.error('------Controller - CRAT command failed', error);
                 throw error;
             };
     }
 
     async stop() {
-        console.log("Controller calling stop")
         const command = AMPCommandFactory.createCommand('stop', {}, this.tcpClient);
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            console.log('------Controller - play command succeeded', response);
+            logger.debug('------CTRL: STOP - command succeeded', response);
             return response;
         } catch(error) {
-                console.log('------Controller - play command failed', error);
+                logger.error('------CTRL: STOP - command failed', error);
                 throw error;
             };
     }
 
     //we use this to cue a clip \ make a clip active
     async inPreset(data) {
-        console.log("Controller calling inPreset", data)
+        //logger.verbose("CTRL: Calling inPreset ", data)
         const command = AMPCommandFactory.createCommand('inPreset', data, this.tcpClient);
         this.commandQueue.addCommand(command);
         
         try { 
             const response = await command.promise;
-            console.log('------Controller - inPreset command succeeded', response);
+            logger.debug('------CTRL: inPreset - command succeeded', response);
             return response;
         } catch(error) {
-                console.log('------Controller - inPreset command failed', error);
+                logger.error('------CTRL: inPreset - command failed', error);
                 throw error;
             };
     }
 
     async play(data) {
-        console.log("Controller calling play")
+        //logger.verbose("CTRL: Calling play")
         const command = AMPCommandFactory.createCommand('play', data, this.tcpClient);
         this.commandQueue.addCommand(command);
 
         try { 
             const response = await command.promise;
-            console.log('------Controller - play command succeeded', response);
+            logger.debug('------CTRL: Play - Command succeeded', response);
             return response;
         } catch(error) {
-                console.log('------Controller - play command failed', error);
+                logger.error('------CTRL: Play - play command failed', error);
                 throw error;
             };
     }
@@ -527,13 +532,12 @@ class ProVideoServerController {
 
         try { 
             const response = await command.promise;
-            console.log('------Controller - IDLoadedRequest command succeeded', response);
+            logger.debug('------CTRL: IDLoadedRequest - command succeeded', response);
             return response;
         } catch(error) {
-                console.log('------Controller - IDLoadedRequest command failed', error);
+                logger.error('------CTRL: IDLoadedRequest -  command failed', error);
                 throw error;
             };
-        //console.log('********************************', r)
     }
 
     // we use this to see what the current time is 
@@ -542,10 +546,10 @@ class ProVideoServerController {
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            console.log('------Controller - currentTimeSense command succeeded', response);
+            logger.debug('------CTRL: currentTimeSense - command succeeded', response);
             return response;
         } catch(error) {
-                console.log('------Controller - currentTimeSense command failed', error);
+                logger.error('------CTRL: currentTimeSense - command failed', error);
                 throw error;
             };
     }
@@ -556,10 +560,10 @@ class ProVideoServerController {
     this.commandQueue.addCommand(command);
     try { 
         const response = await command.promise;
-        console.log('------Controller - listFirstRequest command succeeded', response);
+        logger.debug('------CTRL: listFirstRequest - command succeeded', response);
         return response;
     } catch(error) {
-            console.log('------Controller - listFirstRequest command failed', error);
+            logger.error('------CTRL: listFirstRequest - command failed', error);
             throw error;
         };
 }
@@ -569,10 +573,10 @@ class ProVideoServerController {
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            console.log('------Controller - listNextRequest command succeeded', response);
+            logger.debug('------CTRL: listNextRequest - command succeeded', response);
             return response;
         } catch(error) {
-                console.log('------Controller - listNextRequest command failed', error);
+                logger.error('------CTRL: listNextRequest - command failed', error);
                 throw error;
             };
     }
@@ -582,43 +586,43 @@ class ProVideoServerController {
 
     //get all clip details
     getAllClips(callback) {
-        console.log("CTRL: Called get ALL clip (details)");
+        logger.verbose("CTRL: Called get ALL clip (details)");
         return this.libraryParser.getAllClips(callback);
     }
 
     //get clip details by name
     getClipByName(name, callback) {
-        console.log("CTRL: Called get clip (details) by name", name);
+        logger.verbose("CTRL: Called get clip (details) by name", name);
         return this.libraryParser.getClipByName(name, callback);
     }
 
     //get clip details by name
     getClipByCleanName(name, callback) {
-        console.log("CTRL: Called get clip (details) by clean name", name);
+        logger.verbose("CTRL: Called get clip (details) by clean name", name);
         return this.libraryParser.getClipByCleanName(name, callback);
     }
 
     //get clip details by index
     getClipByIndex(index, callback) {
-        console.log("CTRL: Called get clip (details) by index", index);
+        logger.verbose("CTRL: Called get clip (details) by index", index);
         return this.libraryParser.getClipByIndex(index, callback);
     }
 
     //set a clip as selected
     setClipSelected(index) {
-        console.log("CTRL: Called set selected active clip by index", index);
+        logger.verbose("CTRL: Called set selected active clip by index", index);
         return this.libraryParser.selectClip(index);
     }
 
     //set a clip as selected
    getClipSelected(callback) {
-        console.log("CTRL: Called get selected active clip");
+        logger.verbose("CTRL: Called get selected active clip");
         return this.libraryParser.getClipSelected(callback);
     }
 
     //set a clip as selected
     setClipTimer(clipname, timer, timecode, callback) {
-        console.log("CTRL: Called set timer for clip", clipname);
+        logger.verbose("CTRL: Called set timer for clip", clipname);
         return this.libraryParser.setClipTimer(clipname, timer.timecode, timecode, callback);
     }
 
