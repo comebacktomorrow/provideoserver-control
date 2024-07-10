@@ -66,7 +66,7 @@ async function handleCommand(command) {
             });
             break;
         case 'n':
-            controller.getClipByName('example_clip', (err, clip) => {
+            controller.getClipByName('Untitled', (err, clip) => {
                 if (err) {
                     console.error("error", err);
                 } else {
@@ -124,6 +124,9 @@ async function handleCommand(command) {
         break;
         case '[':
             controller.jumpTime({timecode: { frames: 0, seconds: 15, minutes: 0, hours: 0 }, operation: 'subtract'});
+        break;
+        case 'b':
+            controller.jumpBack({timecode: { frames: 0, seconds: 15, minutes: 0, hours: 0 }, operation: 'subtract'});
         break;
         case 'r':
             controller.requeueClip();
