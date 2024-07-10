@@ -234,6 +234,24 @@ class PVSLibraryParser {
         });
     }
 
+    setClipTimer(name, timer, timecode, callback) {
+        console.log('Playlist: Get clip name', name);
+        const clip = this.playlist.find(node => node.plnName === name);
+    
+        // Perform additional actions
+        if (clip) {
+            console.log('Clip found:', clip);
+            clip[timer] = timecode; // Dynamically set the property name
+            console.log(`Set ${timer} to`, timecode);
+        } else {
+            console.log('Clip not found');
+        }
+    
+        // If you need a callback, you can call it here
+        callback(null, clip);
+    }
+    
+
     getClipSelected(callback) {
         callback(null, this.playlist.find(node => node.isSelected));
     }
