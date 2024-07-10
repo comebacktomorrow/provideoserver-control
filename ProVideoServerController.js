@@ -3,7 +3,7 @@ const AMPCommandFactory = require('./AMPCommandFactory');
 const AMPCommandQueue = require('./AMPCommandQueue');
 const PVSLibraryParser = require('./PVSLibraryParser');
 const TCPClient = require('./TCPClient');
-const { operateTimecodes } = require('./utilities');
+const { operateTimecodes, timecodeToFrames } = require('./utilities');
 
 class ProVideoServerController {
     constructor(ip, port, channelNumber) {
@@ -12,8 +12,23 @@ class ProVideoServerController {
         this.tcpClient.setController(this); // Pass the controller to the TCP client
         this.libraryParser = new PVSLibraryParser(channelNumber); // Initialize PVSLibraryParser with the channel number
 
-        //CONST AUTO_CUE_TIMER = 5;
+
+        this.currentClip = { plnName: ""}; // State for current clip
+        this.previousClip = null; // Previous state for clip
+        this.currentTime = null; // State for current time
+        this.previousTime = null; // Previous state for time
+        this.transportState = 'STOPPED'; // Initialize transport state
+
+        //this.currentClipObj = [];
+
+        this.autoCueTimer = null;
+        this.AUTO_CUE_TIMER = 5000;
+        //this.AUTO_CUE_SET = false;
         //VAR AUTO_CUE_ENABLED = true;
+        
+        
+        this.pollingInterval = 1000; // Polling interval in milliseconds
+        this.startPolling();
 
 
         this.libraryParser.loadPlaylist((err, playlistNodes) => {
@@ -23,6 +38,158 @@ class ProVideoServerController {
                 }
 
         });
+    }
+
+    //still need to convert T1 \ T2 \ TRT to timecode - actually need quite a bit more work
+    //need set and clear trt functions
+    
+    
+    
+    //need to deal with playlist updates
+
+    //jumpBack function - done
+
+    // Fixed
+    //isAlmostAtEnd - and fix dodgy end timecodes // fixed - we were missing a timecode rate
+    // now we just need a way to calculate playback percerntage and if we're in 0.1% of that and paused move to next clip
+
+    startPolling() {
+        this.pollInterval = setInterval(async () => {
+            try {
+                await this.updateLoadedClipPlaylistData();
+                await this.updateCurrentTimecode();
+                this.updateTransportState();
+            } catch (error) {
+                console.error('Error during polling:', error);
+            }
+        }, 1000); // Adjust the interval as needed
+    }
+
+    stopPolling() {
+        clearInterval(this.pollInterval);
+    }
+
+    async updateLoadedClipPlaylistData() {
+        try {
+            const data = await this.IDLoadedRequest();
+            if (data.data.clipname[0] != this.currentClip.plnName){
+                console.log("******************************************POLL: Clip name changed")
+                //this.currentClip = await this.getClipByName(data.data.clipname[0], (err, clip));
+                this.getClipByName(data.data.clipname[0], (err, clip) => {
+                            if (err) {
+                                console.error("error", err);
+                                reject(err);
+                            } else {
+                                console.log("gLCPD updating loaded clip clip:", clip);
+                                this.currentClip = clip;
+                                //this.currentClipObj = data.data;
+                                this.setClipSelected(clip.index);
+                            }
+                        });
+                //this.setClipSelected(this.currentClip.index);
+            }
+        } catch (error) {
+            console.error('Error updating loaded clip playlist data:', error);
+        }
+    }
+
+    async updateCurrentTimecode() {
+        try {
+            const data = await this.currentTimeSense();
+            this.currentTimecode = data.data.timecode;
+            this.currentTime = data.data.timecode;
+        } catch (error) {
+            console.error('Error updating current timecode:', error);
+        }
+    }
+
+    updateTransportState() {
+        console.log("TC *******************************************",this.currentTimecode);
+        let framerate = + this.currentClip.fps;
+        console.log(framerate);
+        let jumptime = {timecode: { frames: 2, seconds: 0, minutes: 0, hours: 0 }, operation: 'subtract'}
+        let jumptc = operateTimecodes(jumptime.timecode,  this.currentClip.duration, jumptime.operation, framerate )
+        console.log("END  *******************************************",jumptc);
+        if (!this.currentClip || !this.currentTimecode) return;
+
+        const { hours, minutes, seconds, frames } = this.currentTimecode;
+        console.log("TC *******************************************",this.currentClip);
+        if (hours === 0 && minutes === 0 && seconds === 0 && (frames === 0 || frames === 1)) {
+            this.transportState = 'AT_START';
+            this.clearAutoCueTimer();
+        } else if ( //we need to redo the duration
+            hours === jumptc.hours &&
+            minutes === jumptc.minutes &&
+            seconds === jumptc.seconds &&
+            (frames === jumptc.frames )
+        ) {
+            this.transportState = 'AT_END';
+            if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null) {
+                this.setAutoCueTimer();
+              }
+        } else if (this.isPlaying(this.currentTimecode)) {
+            this.transportState = 'PLAYING';
+            this.clearAutoCueTimer();
+        } else {
+            
+            let progress = ((timecodeToFrames(this.currentTimecode, framerate)/ timecodeToFrames(this.currentClip.duration, framerate)));
+            console.log("PROGRESS", progress)
+            // this is our soft stop function - if we're within 0.1% of the end, we'll treat it as a stop
+            if  ((progress) >= 0.99){
+                this.transportState = 'AT_END';
+                if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null) {
+                    this.setAutoCueTimer();
+                  }
+            } else {
+                this.transportState = 'PAUSED';
+                this.clearAutoCueTimer();
+            }
+
+            
+        }
+        console.log("TRANSPOT:", this.transportState)
+    }
+
+    clearAutoCueTimer(){
+        if (this.autoCueTimer) {
+            clearTimeout(this.autoCueTimer);
+            this.autoCueTimer = null;
+        }
+    }
+
+    setAutoCueTimer() {
+        console.log("SET TIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERR")
+        this.autoCueTimer = setTimeout(() => {
+            if (this.transportState === 'AT_END') {
+                console.log("AutoCue time out - going to next");
+                this.queueNext();
+                clearTimeout(this.autoCueTimer);
+            }
+        }, this.AUTO_CUE_TIMER);
+    }
+
+    isPlaying(now) {
+        // Check if previous time is defined
+        if (!this.previousTime) {
+            this.previousTime = now;
+            return false;
+        }
+    
+        // Compare each component of the timecode objects
+        if (this.previousTime.frames !== now.frames ||
+            this.previousTime.seconds !== now.seconds ||
+            this.previousTime.minutes !== now.minutes ||
+            this.previousTime.hours !== now.hours) {
+    
+            this.previousTime = now;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    getTransportState() {
+        return this.transportState;
     }
 
     handleResponse(response) {
