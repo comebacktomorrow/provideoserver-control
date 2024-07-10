@@ -552,6 +552,12 @@ class ProVideoServerController {
         return this.libraryParser.getClipSelected(callback);
     }
 
+    //set a clip as selected
+    setClipTimer(clipname, timer, timecode, callback) {
+        console.log("CTRL: Called set timer for clip", clipname);
+        return this.libraryParser.setClipTimer(clipname, timer.timecode, timecode, callback);
+    }
+
 
 }
 
