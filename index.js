@@ -38,7 +38,7 @@ async function handleCommand(command) {
         case 'h':
             controller.pause(); // Example: play with default time
             break;
-        case 'c':
+        case 'k':
             controller.CRAT({ channel: "Vtr1"}); // Example: play with default time
             break;
         case 's':
