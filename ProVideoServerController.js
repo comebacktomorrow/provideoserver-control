@@ -135,6 +135,9 @@ class ProVideoServerController {
                 this.cueUpData({timecode: tc})
                     .then(data => {
                         console.log(" set timecode to ", tc)
+                        if (ts == "PLAYING"){
+                            this.play();
+                    }
                     })
                     .catch (error => { console.error('Error:', error);  })
             })
