@@ -30,7 +30,7 @@ class AMPResponseParser {
                 }
                 break;
             case '7404':
-                console.log('RP: 74.04 Handle timecode');
+                console.log('RP: 74.04 Handle timecode', response.data);
                 response.data = unpackRawTimecode(response.data); //we also need a unpack messy timecode as well
                 break;
             case '8216':

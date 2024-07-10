@@ -94,16 +94,18 @@ class PVSLibraryParser {
     }
 
     getClipByName(name, callback) {
+        console.log('Playlist: Get clip name', name);
         callback(null, this.playlist.find(node => node.plnName === name));
     }
 
     getClipByIndex(index, callback) {
+        console.log('Playlist: Get clip index', index);
         if (index === -1) {
             // Get the last clip
             callback(null, this.playlist[this.playlist.length - 1]);
-        } else if (index >= this.playlist.length ) {
+        } else if (index >= this.playlist.length) {
             // Get the first clip
-            console.log('get first clip')
+            console.log('get first clip');
             callback(null, this.playlist[0]);
         } else {
             // Get the clip at the specified index
@@ -112,7 +114,7 @@ class PVSLibraryParser {
     }
 
     selectClip(index) {
-        console.log("PVSLP: setting active index to:", index)
+        console.log("Playlist: setting active index to:", index);
         this.playlist.forEach((node, idx) => {
             node.isSelected = (idx === index);
         });
