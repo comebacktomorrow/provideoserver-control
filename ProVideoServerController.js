@@ -528,6 +528,12 @@ class ProVideoServerController {
         return this.libraryParser.getClipByName(name, callback);
     }
 
+    //get clip details by name
+    getClipByCleanName(name, callback) {
+        console.log("CTRL: Called get clip (details) by clean name", name);
+        return this.libraryParser.getClipByCleanName(name, callback);
+    }
+
     //get clip details by index
     getClipByIndex(index, callback) {
         console.log("CTRL: Called get clip (details) by index", index);
