@@ -101,6 +101,14 @@ async function handleCommand(command) {
                 }
             });
             break;
+        case '0':
+            controller.setClipTimer('A2400', 't1',{ timecode: { frames: 21, seconds: 6, minutes: 1, hours: 0 } }, (err, clip) => {
+                if (err) {
+                    console.error("error", err);
+                } else {
+                    console.log("ok", clip);
+                }
+            });
         case '1':
             controller.loadClipByIndex(0);
         break;
