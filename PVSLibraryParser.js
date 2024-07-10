@@ -9,7 +9,6 @@ class PVSLibraryParser {
         this.homeDirectory = process.env.HOME || process.env.USERPROFILE;
         this.playlistFilePath = path.join(this.homeDirectory, 'Documents/ProVideoServer.pvs3');
         this.playlist = [];
-
     }
 
     loadPlaylist() {
@@ -62,15 +61,28 @@ class PVSLibraryParser {
 
         if (t1Match) {
             node.$.t1 = `${t1Match[1]}:${t1Match[2]}:${t1Match[3]}:${t1Match[4]}`;
+            // const t1duration = this.convertDurationToTimecode(node.$.t1, node.$.fps);
+            // node.$.t1 = t1duration;
         }
         if (t2Match) {
             node.$.t2 = `${t2Match[1]}:${t2Match[2]}:${t2Match[3]}:${t2Match[4]}`;
+            // const t2duration = this.convertDurationToTimecode(node.$.t2, node.$.fps);
+            // node.$.t2 = t2duration;
         }
         if (trtMatch) {
             const trtValue = parseFloat(trtMatch[1]);
             const duration = parseFloat(node.$.duration);
             node.$.trt = trtValue < 0 ? duration + trtValue : trtValue;
+            // const trtduration = this.convertDurationToTimecode(node.$.trt, node.$.fps);
+            // node.$.trt = trtduration;
         }
+
+        // Parse the duration from "seconds.frames" to a structured format
+        const duration = this.convertDurationToTimecode(node.$.duration, node.$.fps);
+        node.$.duration = duration;
+
+        const playbackBehavior = this.parsePlaybackBehavior(node.$.playbackBehavior)
+        node.$.playbackBehavior = playbackBehavior;
 
         // Keep only essential attributes and format them as required
         const essentialAttributes = ['UUID', 'plnName', 'plnSourcePath', 'fps', 'duration', 'playbackBehavior', 'sizeString', 'formatString', 't1', 't2', 'trt'];
@@ -87,9 +99,46 @@ class PVSLibraryParser {
         return formattedNode;
     }
 
+    convertDurationToTimecode(duration, fps) {
+        // Calculate total frames
+        let totalFrames = Math.round(duration * fps);
+      
+        // Calculate hours
+        const hours = Math.floor(totalFrames / (fps * 3600));
+        totalFrames -= hours * fps * 3600;
+      
+        // Calculate minutes
+        const minutes = Math.floor(totalFrames / (fps * 60));
+        totalFrames -= minutes * fps * 60;
+      
+        // Calculate seconds
+        const seconds = Math.floor(totalFrames / fps);
+        totalFrames -= seconds * fps;
+      
+        // Remaining frames
+        const frames = Math.floor(totalFrames);
+      
+        // Return the timecode as an object
+        return {
+          hours: hours,
+          minutes: minutes,
+          seconds: seconds,
+          frames: frames,
+        };
+    }
+
+    parsePlaybackBehavior(value) {
+        const playbackBehaviors = {
+          0: 'STOP',
+          1: 'LOOP',
+          2: 'NEXT'
+        };
+      
+        return playbackBehaviors[value] || 'UNKNOWN';
+    }
+
     getAllClips(callback) {
-        console.log('Playlist: Return all clips')
-       //console.log(this.playlist)
+        console.log('Playlist: Return all clips');
         callback(null, this.playlist);
     }
 
