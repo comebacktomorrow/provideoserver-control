@@ -25,6 +25,7 @@ class ProVideoServerController {
 
         this.autoCueTimer = null;
         this.AUTO_CUE_TIMER = 5000;
+        this.autoCueDisable = false;
         //this.AUTO_CUE_SET = false;
         //VAR AUTO_CUE_ENABLED = true;
         
@@ -172,6 +173,18 @@ class ProVideoServerController {
             clearTimeout(this.autoCueTimer);
             this.autoCueTimer = null;
         }
+    }
+
+    enableAutoCue(){
+        this.autoCueDisable = false;
+    }
+
+    disableAutoCue(){
+        this.autoCueDisable = true;
+    }
+
+    getAutoCueDisaled(){
+        return this.autoCueDisable;
     }
 
     setAutoCueTimer() {
