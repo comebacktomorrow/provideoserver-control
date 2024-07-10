@@ -56,25 +56,31 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
     const seconds = parseInt(timecode.slice(-6, -4), 10);
     let frames = parseInt(timecode.slice(0,-6), 10);
 
-    //we're now dealing with a PVP timcode bug
-    // The frame rate gets seemingly multiplied by refresh rate * frame rate * min + frames
-    // We can infer the frame rate frequenty - but since we can read the frame rate from the library we can pass that in
+    if (hours > 0) {
+        screenRefreshRate = 1; // if the bug changes at the one hour mark
+    }
+
+    // Handling timecode bug: frame rate gets seemingly multiplied by refresh rate * frame rate * min + frames
+    // Adjust frames if a frame rate is provided
     if (frameRateOR) {
-        console.log('FR override ' + frames);
-        frames = Math.round((frames - (hours*60 + minutes)*screenRefreshRate*frameRateOR));
+        //console.log('##############################FR override ' + frames);
+        frames = Math.round((frames - (hours * 3600 + minutes * 60) * screenRefreshRate * frameRateOR));
     } else if (frames > 60 && !frameRateOR){
         for (const frameRate of possibleFrameRates) {
-            const minFrameValue = (minutes * screenRefreshRate * frameRate);
+            let minFrameValue = (minutes * screenRefreshRate * frameRate);
+            if (hours > 0){ 
+                minFrameValue = (((hours* 3600) + minutes * 60) * screenRefreshRate * frameRate);
+            }
             const maxFrameValue = minFrameValue + frameRate - 1;
 
-            //console.log("fr " + frameRate + " min " + minFrameValue + " max " + maxFrameValue)
-    
+            //console.log("########################NO FR OR fr " + frameRate + " min " + minFrameValue + " max " + maxFrameValue);
+
             if (frames >= minFrameValue && frames <= maxFrameValue) {
                 const trueFrameValue = frames - minFrameValue;
-                // console.log({
-                //     frameRate: frameRate,
-                //     trueFrameValue: trueFrameValue
-                // });
+                console.log({
+                    frameRate: frameRate,
+                    trueFrameValue: trueFrameValue
+                });
                 frames = Math.round(trueFrameValue);
             }
         }
