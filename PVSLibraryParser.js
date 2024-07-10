@@ -89,7 +89,7 @@ class PVSLibraryParser {
             timecode.hours = Math.floor(Math.abs(totalSeconds) / 3600);
             timecode.minutes = Math.floor((Math.abs(totalSeconds) % 3600) / 60);
             timecode.seconds = Math.abs(totalSeconds) % 60;
-            timecode.frames = 0; // Assuming no frames for short pattern
+            timecode.frames = Math.abs(0); // Assuming no frames for short pattern
             
             if (isNegative) {
                 console.log("Negative fime found")
@@ -103,7 +103,12 @@ class PVSLibraryParser {
     
         // If no pattern matched, return null or handle accordingly
         console.log(`No match found for ${tag}`);
-        return [];
+        return {
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+            frames: 0
+        };
     }
     
     extractAdditionalAttributes(node) {
@@ -134,7 +139,12 @@ class PVSLibraryParser {
             };
             node.$.trt = trtTimecode;
         } else {
-            node.$.trt = [];
+            //if we don't have a TRT we set it to end of clip time
+            node.$.trt = {      
+                hours: duration.hours,
+                minutes: duration.minutes,
+                seconds: duration.seconds,
+                frames: duration.frames};
         }
 
         // Clean plnName to create cleanName
