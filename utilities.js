@@ -86,13 +86,14 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
         }
     }
 
-    return { timecode: {frames, seconds, minutes, hours }};
+    return { timecode: { frames, seconds, minutes, hours } };
 }
 
 //Note we assume TC1 is the modifying timecode and TC2 is the track timecode
 function operateTimecodes(tc1, tc2, operation, frameRate = 0) {
     let frames = 0, seconds, minutes, hours;
 
+    console.log ("PERFORMING TC OPERATION", tc1, tc2, operation, frameRate)
 
     if (operation === 'add') {
         frames = tc1.frames + tc2.frames;
@@ -118,7 +119,9 @@ function operateTimecodes(tc1, tc2, operation, frameRate = 0) {
         hours = tc2.hours - tc1.hours;
 
         if (frameRate > 0 && frames < 0) {
+            console.log('changing frames from ', frames)
             frames += frameRate;
+            console.log('to ', frames)
             seconds -= 1;
         }
 
