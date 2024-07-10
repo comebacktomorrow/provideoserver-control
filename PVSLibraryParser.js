@@ -1,4 +1,5 @@
 //PVSLibraryParser.js
+const chokidar = require('chokidar');
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
@@ -10,7 +11,25 @@ class PVSLibraryParser {
         this.homeDirectory = process.env.HOME || process.env.USERPROFILE;
         this.playlistFilePath = path.join(this.homeDirectory, 'Documents/ProVideoServer.pvs3');
         this.playlist = [];
+        
+        this.setupFileWatcher();
     }
+
+    setupFileWatcher() {
+        // Initialize chokidar watcher
+        this.watcher = chokidar.watch(this.playlistFilePath, {
+            persistent: true
+        });
+
+        // Add event listeners
+        this.watcher.on('change', (path) => {
+            console.log(`${path} has changed`);
+            this.loadPlaylist();
+        });
+
+        console.log(`Watching for changes in ${this.playlistFilePath}`);
+    }
+
 
     loadPlaylist() {
         return new Promise((resolve, reject) => {
