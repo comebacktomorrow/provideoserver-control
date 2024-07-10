@@ -91,64 +91,81 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
 
 //Note we assume TC1 is the modifying timecode and TC2 is the track timecode
 function operateTimecodes(tc1, tc2, operation, frameRate = 0) {
-    let frames = 0, seconds, minutes, hours;
-
-    console.log ("PERFORMING TC OPERATION", tc1, tc2, operation, frameRate)
-
+    let frames = 0,
+      seconds,
+      minutes,
+      hours,
+      negative = false;
+  
     if (operation === 'add') {
-        frames = tc1.frames + tc2.frames;
-        seconds = tc1.seconds + tc2.seconds;
-        minutes = tc1.minutes + tc2.minutes;
-        hours = tc1.hours + tc2.hours;
-
-        if (frameRate > 0) {
-            seconds += Math.floor(frames / frameRate);
-            frames = frames % frameRate;
-        }
-
-        minutes += Math.floor(seconds / 60);
-        seconds = seconds % 60;
-
-        hours += Math.floor(minutes / 60);
-        minutes = minutes % 60;
-
+      frames = tc1.frames + tc2.frames;
+      seconds = tc1.seconds + tc2.seconds;
+      minutes = tc1.minutes + tc2.minutes;
+      hours = tc1.hours + tc2.hours;
+  
+      if (frameRate > 0) {
+        seconds += Math.floor(frames / frameRate);
+        frames = frames % frameRate;
+      }
+  
+      minutes += Math.floor(seconds / 60);
+      seconds = seconds % 60;
+  
+      hours += Math.floor(minutes / 60);
+      minutes = minutes % 60;
     } else if (operation === 'subtract') {
-        frames =  tc2.frames - tc1.frames;
-        seconds = tc2.seconds - tc1.seconds;
-        minutes = tc2.minutes - tc1.minutes;
-        hours = tc2.hours - tc1.hours;
-
-        if (frameRate > 0 && frames < 0) {
-            console.log('changing frames from ', frames)
-            frames += frameRate;
-            console.log('to ', frames)
-            seconds -= 1;
-        }
-
-        if (seconds < 0) {
-            seconds += 60;
-            minutes -= 1;
-        }
-
-        if (minutes < 0) {
-            minutes += 60;
-            hours -= 1;
-        }
-
-        if (hours < 0) {
-            throw new Error("Resulting timecode is negative");
-        }
+      // Ensure tc1 is the smaller timecode and tc2 is the larger timecode
+      if (compareTimecodes(tc1, tc2) > 0) {
+        const temp = tc1;
+        tc1 = tc2;
+        tc2 = temp;
+        negative = true; // Mark as negative since we swapped tc1 and tc2
+      }
+  
+      frames = tc2.frames - tc1.frames;
+      seconds = tc2.seconds - tc1.seconds;
+      minutes = tc2.minutes - tc1.minutes;
+      hours = tc2.hours - tc1.hours;
+  
+      if (frameRate > 0 && frames < 0) {
+        frames = ((frames % frameRate) + frameRate) % frameRate;
+        seconds -= 1;
+      }
+  
+      if (seconds < 0) {
+        seconds += 60;
+        minutes -= 1;
+      }
+  
+      if (minutes < 0) {
+        minutes += 60;
+        hours -= 1;
+      }
+  
+      if (hours < 0) {
+        hours = 0; // Reset hours to 0 if negative (optional)
+        negative = true; // Mark as negative
+      }
     } else {
-        throw new Error("Invalid operation. Use 'add' or 'subtract'.");
+      throw new Error("Invalid operation. Use 'add' or 'subtract'.");
     }
-
+  
     return {
-        frames: frames,
-        seconds: seconds,
-        minutes: minutes,
-        hours: hours
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+      frames: frames,
+      negative: negative,
     };
-}
+  }
+  
+  // Function to compare two timecodes
+  function compareTimecodes(tc1, tc2) {
+    if (tc1.hours !== tc2.hours) return tc1.hours - tc2.hours;
+    if (tc1.minutes !== tc2.minutes) return tc1.minutes - tc2.minutes;
+    if (tc1.seconds !== tc2.seconds) return tc1.seconds - tc2.seconds;
+    return tc1.frames - tc2.frames;
+  }
 
 function timecodeToFrames(timecode, frameRate) {
     const { hours, minutes, seconds, frames } = timecode;
