@@ -242,6 +242,56 @@ class ProVideoServerController {
         });
     }
 
+    async loadClipByName(name) {
+        console.log(`CTRL: Called load clip by index ${name}`);
+        return new Promise((resolve, reject) => {
+            this.getClipByName(name, (err, clip) => {
+                if (err) {
+                    console.error('Error getting clip by name:', err);
+                    reject(err);
+                } else if (clip) {
+                    console.log(`Loading clip: ${clip.plnName}`);
+                    this.inPreset({ clipname: clip.plnName })
+                        .then(response => {
+                            console.log(`Clip loaded successfully: ${clip.plnName}`);
+                            resolve(response);
+                        })
+                        .catch(error => {
+                            console.error('Error in loadClipByIndex:', error);
+                            reject(error);
+                        });
+                } else {
+                    reject(new Error('Clip not found'));
+                }
+            });
+        });
+    }
+
+    async loadClipByCleanName(name) {
+        console.log(`CTRL: Called load clip by index ${name}`);
+        return new Promise((resolve, reject) => {
+            this.getClipByCleanName(name, (err, clip) => {
+                if (err) {
+                    console.error('Error getting clip by name:', err);
+                    reject(err);
+                } else if (clip) {
+                    console.log(`Loading clip: ${clip.plnName}`);
+                    this.inPreset({ clipname: clip.plnName })
+                        .then(response => {
+                            console.log(`Clip loaded successfully: ${clip.plnName}`);
+                            resolve(response);
+                        })
+                        .catch(error => {
+                            console.error('Error in loadClipByIndex:', error);
+                            reject(error);
+                        });
+                } else {
+                    reject(new Error('Clip not found'));
+                }
+            });
+        });
+    }
+
     // possibly should be called updateLoadedClip
     getLoadedClipPlaylistData() {
         console.log("CTRL: Called get details for active clip on timeline");
