@@ -188,11 +188,8 @@ class ProVideoServerController {
     }
 
     setAutoCueTimer() {
-        console.log("SET TIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERRTIMERR")
         logger.debug("CTRL: AUTOCUE - Timer has been set")
         this.autoCueTimer = setTimeout(() => {
-            if (this.transportState === 'AT_END') {
-                console.log("AutoCue time out - going to next");
             if (this.transportState === 'AT_END' && !this.autoCueDisable) {
                 logger.debug("CTRL: AUTOCUE - AutoCue time out - queueing next clip");
                 this.queueNext();
