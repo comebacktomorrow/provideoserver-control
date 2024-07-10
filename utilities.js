@@ -48,8 +48,8 @@ function packTimecode(timecodeObj) {
 }
 
 function unpackRawTimecode(timecode, frameRateOR = null) {
-    const possibleFrameRates = [23.976, 24, 25, 29.97, 30, 50, 60];
-    const screenRefreshRate = 60;
+    const possibleFrameRates = [23.976024, 24, 25, 29.97, 30, 50, 59.940060 , 60];
+    let screenRefreshRate = 60;
 
     const hours = parseInt(timecode.slice(-2), 10);
     const minutes = parseInt(timecode.slice(-4, -2), 10);
