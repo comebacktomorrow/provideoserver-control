@@ -66,7 +66,16 @@ async function handleCommand(command) {
             });
             break;
         case 'n':
-            controller.getClipByName('Untitled', (err, clip) => {
+            controller.loadClipByName('A2400', (err, clip) => {
+                if (err) {
+                    console.error("error", err);
+                } else {
+                    console.log("ok", clip);
+                }
+            });
+            break;
+        case 'c':
+            controller.loadClipByCleanName('C5000 copy', (err, clip) => {
                 if (err) {
                     console.error("error", err);
                 } else {
