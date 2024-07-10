@@ -116,15 +116,10 @@ class ProVideoServerController {
         });
     }
 
+    //we might need to do some logic checking to make sure we stay within the bounds
+    // we probably ideally would maintain state - keep playing if playing, and nothing if not
+    // we technically should be using  frame rate as well - this.getClipSelected().data.fps
     jumpTime(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
-        //get current time
-        //add\subtract the time to the current time
-        //inPreset(new time)
-        // we also want to get the current state and maintain that
-        //we might need to do some logic checking to make sure we stay within the bounds
-
-        
-//this.getClipSelected().data.fps
         this.currentTimeSense()
             .then(data => {
                 console.log(" jumping at ", jumptime)
