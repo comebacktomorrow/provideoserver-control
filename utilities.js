@@ -141,6 +141,25 @@ function operateTimecodes(tc1, tc2, operation, frameRate = 0) {
     };
 }
 
+function timecodeToFrames(timecode, frameRate) {
+    const { hours, minutes, seconds, frames } = timecode;
+    const totalFrames = (
+      (hours * 3600 + minutes * 60 + seconds) * frameRate + frames
+    );
+    return totalFrames;
+  }
+
+  function framesToTimecode(totalFrames, frameRate) {
+    const frames = totalFrames % frameRate;
+    const totalSeconds = Math.floor(totalFrames / frameRate);
+    const seconds = totalSeconds % 60;
+    const totalMinutes = Math.floor(totalSeconds / 60);
+    const minutes = totalMinutes % 60;
+    const hours = Math.floor(totalMinutes / 60);
+  
+    return { hours, minutes, seconds, frames };
+  }
+
 function unpackExtendedNameFormat(data) {
     let offset = 0;
     const fileNames = [];
@@ -228,5 +247,7 @@ module.exports = {
     unpackExtendedNameFormat,
     unpackRawTimecode,
     packTimecode,
-    operateTimecodes
+    operateTimecodes,
+    timecodeToFrames,
+    framesToTimecode
 };
