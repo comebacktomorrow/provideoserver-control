@@ -342,19 +342,19 @@ class ProVideoServerController {
 
     //get clip details by name
     getClipByName(name, callback) {
-        console.log("CTRL: Called get clip (details) by name");
+        console.log("CTRL: Called get clip (details) by name", name);
         return this.libraryParser.getClipByName(name, callback);
     }
 
     //get clip details by index
     getClipByIndex(index, callback) {
-        console.log("CTRL: Called get clip (details) by index");
+        console.log("CTRL: Called get clip (details) by index", index);
         return this.libraryParser.getClipByIndex(index, callback);
     }
 
     //set a clip as selected
     setClipSelected(index) {
-        console.log("CTRL: Called set selected active clip by index");
+        console.log("CTRL: Called set selected active clip by index", index);
         return this.libraryParser.selectClip(index);
     }
 
