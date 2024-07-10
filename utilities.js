@@ -133,6 +133,8 @@ function operateTimecodes(tc1, tc2, operation, frameRate = 0) {
         frames = ((frames % frameRate) + frameRate) % frameRate;
         seconds -= 1;
       }
+
+      frames = Math.abs(frames);
   
       if (seconds < 0) {
         seconds += 60;
