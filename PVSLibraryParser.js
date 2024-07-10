@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
+const { operateTimecodes } = require('./utilities');
 
 class PVSLibraryParser {
     constructor(channelNumber) {
@@ -152,10 +153,10 @@ class PVSLibraryParser {
                 formattedNode[attr] = node.$[attr];
             }
         });
-
+    
         formattedNode.index = node.index;
         formattedNode.isSelected = node.isSelected;
-
+    
         return formattedNode;
     }
 
