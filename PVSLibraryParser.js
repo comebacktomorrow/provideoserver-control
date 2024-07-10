@@ -207,6 +207,11 @@ class PVSLibraryParser {
         callback(null, this.playlist.find(node => node.plnName === name));
     }
 
+    getClipByCleanName(cleanName, callback) {
+        console.log('Playlist: Get clip name', cleanName);
+        callback(null, this.playlist.find(node => node.cleanName === cleanName));
+    }
+
     getClipByIndex(index, callback) {
         console.log('Playlist: Get clip index', index);
         if (index === -1) {
