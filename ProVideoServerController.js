@@ -143,6 +143,23 @@ class ProVideoServerController {
         });
     }
 
+    jumpBack(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
+                let endtime = this.currentClip.duration;
+                let tc = operateTimecodes(jumptime.timecode, endtime, 'subtract' )
+                let ts = this.transportState;
+                this.cueUpData({timecode: tc})
+                    .then(data => {
+                        console.log("JUMPING BACK TO TIMECODE ", tc, ts)
+                        if (ts == "PLAYING"){
+                                this.play();
+                        }
+                    })
+                    .catch (error => { console.error('Error:', error);  })
+    }
+
+    
+
+
     async requeueClip() {
         console.log("CTRL: Called requeue clip");
         try {
