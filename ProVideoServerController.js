@@ -224,6 +224,17 @@ class ProVideoServerController {
         return this.transportState;
     }
 
+    getLoadedNameClip() {
+        return this.currentClip.plnName;
+    }
+
+
+
+    getCurrentTransportTime() {
+        //console.log(this.clocks.currentTimecode)
+        return this.clocks.currentTimecode;
+    }
+
     handleResponse(response) {
         //logger.verbose('---Controller: processing response');
         if (response.responseType) {
@@ -373,6 +384,23 @@ class ProVideoServerController {
             this.play();
             return 'PLAY'
         }
+    }
+
+    //we might need to do some logic checking to make sure we stay within the bounds
+    // we probably ideally would maintain state - keep playing if playing, and nothing if not
+    // we technically should be using  frame rate as well - this.getClipSelected().data.fps
+    jumpToTimecode(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
+        
+                let ts = this.transportState;
+                logger.debug("CTRL: jumpToTimecode — Jumping " + JSON.stringify(jumptime))
+                this.cueUpData({timecode: jumptime})
+                    .then(data => {
+                        logger.debug("CTRL: jumpToTimecode - Jump Success! Set timecode to " + jumptime + "state reset to" + ts)
+                        if (ts == "PLAYING"){
+                            this.play();
+                    }
+                    })
+                    .catch (error => { logger.error('jumpToTimecode: Cue Up with Data error', error);  });
     }
 
     //we might need to do some logic checking to make sure we stay within the bounds
