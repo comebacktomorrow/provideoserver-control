@@ -7,7 +7,7 @@ const logger = require('./logger');
 const { operateTimecodes, timecodeToFrames } = require('./utilities');
 
 class ProVideoServerController {
-    constructor(ip, port, channelNumber) {
+    constructor(ip, port, channelNumber, channelName) {
         this.tcpClient = new TCPClient(ip, port);
         this.commandQueue = new AMPCommandQueue();
         this.tcpClient.setController(this); // Pass the controller to the TCP client
@@ -28,6 +28,8 @@ class ProVideoServerController {
         this.autoCueDisable = false;
         //this.AUTO_CUE_SET = false;
         //VAR AUTO_CUE_ENABLED = true;
+
+        this.CRAT({ channel: channelName}); 
         
         
         this.pollingInterval = 1000; // Polling interval in milliseconds
