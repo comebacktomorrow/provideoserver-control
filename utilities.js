@@ -190,6 +190,21 @@ function timecodeToFrames(timecode, frameRate) {
     return { hours, minutes, seconds, frames };
   }
 
+  function secondsToTimecode(sec) {
+    let seconds = Math.abs(sec);
+    const hours = Math.floor(seconds / 3600);
+    seconds %= 3600;
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+  
+    return {
+      hours: hours,
+      minutes: minutes,
+      seconds: secs,
+      frames: 0, // Set frames to zero as specified
+    };
+  }
+
 function unpackExtendedNameFormat(data) {
     let offset = 0;
     const fileNames = [];
@@ -279,5 +294,6 @@ module.exports = {
     packTimecode,
     operateTimecodes,
     timecodeToFrames,
-    framesToTimecode
+    framesToTimecode,
+    secondsToTimecode
 };
