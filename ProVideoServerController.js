@@ -302,7 +302,7 @@ class ProVideoServerController {
         return new Promise((resolve, reject) => {
             this.getClipByCleanName(name, (err, clip) => {
                 if (err) {
-                    logger.error('CTRL: loadClipByCleanName - Error getting clip by cleanName:', err);
+                    logger.error('CTRL: loadClipByCleanName - Error getting clip by cleanName:'+ err);
                     reject(err);
                 } else if (clip) {
                     logger.verbose(`CTRL: loadClipByCleanName found real name. Loading clip: ${clip.plnName}`);
@@ -312,11 +312,11 @@ class ProVideoServerController {
                             resolve(response);
                         })
                         .catch(error => {
-                            console.error('CTRL: loadClipByCleanName - Error in inPreset:', error);
+                            console.error('CTRL: loadClipByCleanName - Error in inPreset:'+  error);
                             reject(error);
                         });
                 } else {
-                    reject(new Error('CTRL: loadClipByCleanName - Error getting clip by cleanName:'));
+                    reject(new Error('CTRL: loadClipByCleanName - Error getting clip by cleanName:' + name));
                 }
             });
         });
@@ -475,12 +475,14 @@ class ProVideoServerController {
 
 
     // we use this to cue up timecode
+    // expects
     async cueUpData(data) {
+        console.log(data);
         const command = AMPCommandFactory.createCommand('cueUpData', data, this.tcpClient);
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            logger.debug('------CTRL: cueUpData - command succeeded', data, response);
+            logger.debug('------CTRL: cueUpData - command succeeded' + data + " R "+ response);
             this.transportState = 'CUEING';
             return response;
         } catch(error) {
