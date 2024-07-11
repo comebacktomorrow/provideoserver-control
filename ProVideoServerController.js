@@ -363,6 +363,16 @@ class ProVideoServerController {
         });
     }
 
+    togglePlayback() {
+        if (this.transportState == 'PLAYING'){
+            this.pause();
+            return 'PAUSED'
+        } else {
+            this.play();
+            return 'PLAY'
+        }
+    }
+
     //we might need to do some logic checking to make sure we stay within the bounds
     // we probably ideally would maintain state - keep playing if playing, and nothing if not
     // we technically should be using  frame rate as well - this.getClipSelected().data.fps
