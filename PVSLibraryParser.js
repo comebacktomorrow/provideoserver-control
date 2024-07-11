@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const xml2js = require('xml2js');
 const { operateTimecodes } = require('./utilities');
+const logger = require('./logger');
 
 class PVSLibraryParser {
     constructor(channelNumber) {
@@ -23,11 +24,11 @@ class PVSLibraryParser {
 
         // Add event listeners
         this.watcher.on('change', (path) => {
-            console.log(`${path} has changed`);
+            logger.debug(`Library Parser: Watcher - ${path} has changed`);
             this.loadPlaylist();
         });
 
-        console.log(`Watching for changes in ${this.playlistFilePath}`);
+        logger.debug(`Library Parser: Watcher - Watching for changes in ${this.playlistFilePath}`);
     }
 
 
@@ -64,7 +65,7 @@ class PVSLibraryParser {
                         });
                     }
     
-                    console.log("loaded playlist")
+                    logger.debug("Library Parser: Load Play List - loaded playlist sucessfully")
                     resolve(playlistNodes);
                 });
             });
@@ -86,7 +87,7 @@ class PVSLibraryParser {
         // Try to match the full pattern (hhmmssff)
         const fullMatch = fileName.match(timecodeFullPattern);
         if (fullMatch) {
-            console.log(`Full match found: ${fullMatch}`);
+            logger.verbose(`PVSLibraryParser: extractTimcode - Full match found: ${fullMatch}`);
             timecode.hours = parseInt(fullMatch[1], 10);
             timecode.minutes = parseInt(fullMatch[2], 10);
             timecode.seconds = parseInt(fullMatch[3], 10);
@@ -97,7 +98,7 @@ class PVSLibraryParser {
         // Try to match the short pattern (m{1,2}.ss or -m{1,2}.ss)
         const shortMatch = fileName.match(timecodeShortPattern);
         if (shortMatch) {
-            console.log(`Short match found: ${shortMatch}`);
+            logger.verbose(`PVSLibraryParser: extractTimcode - Short match found: ${shortMatch}`);
             const isNegative = shortMatch[1].startsWith('-');
             const minutes = parseInt(shortMatch[1], 10);
             const seconds = parseInt(shortMatch[2], 10);
@@ -111,7 +112,7 @@ class PVSLibraryParser {
             timecode.frames = Math.abs(0); // Assuming no frames for short pattern
             
             if (isNegative) {
-                console.log("Negative fime found")
+                logger.verbose("PVSLibraryParser: extractTimcode - Started with negative sign. Subtract operation")
                 timecode = operateTimecodes(timecode, duration, 'subtract', fps)
                 // timecode.minutes *= -1;
                 // timecode.seconds *= -1;
@@ -121,7 +122,7 @@ class PVSLibraryParser {
         }
     
         // If no pattern matched, return null or handle accordingly
-        console.log(`No match found for ${tag}`);
+        logger.verbose(`PVSLibraryParser: extractTimcode - No match found for ${tag}`);
         return {
             hours: 0,
             minutes: 0,
@@ -140,7 +141,7 @@ class PVSLibraryParser {
         const t2 = this.extractTimecode(fileName, 't2', duration, node.$.fps);
         const trtMatch = fileName.match(/\[trt=(-?\d+(\.\d+)?)\]/); // run time override
     
-        console.log(`Extracted t1: ${t1}, t2: ${t2}, trtMatch: ${trtMatch}`);
+        logger.verbose(`PVSLibraryParser: extractAdditional Attributes - Extracted t1: ${t1}, t2: ${t2}, trtMatch: ${trtMatch}`);
     
         if (t1) {
             node.$.t1 = t1;
@@ -228,53 +229,53 @@ class PVSLibraryParser {
     }
 
     getAllClips(callback) {
-        console.log('Playlist: Return all clips');
+        logger.verbose('PVSLibrary Parser (playlist): getAllClips - Return all clips');
         callback(null, this.playlist);
     }
 
     getClipByName(name, callback) {
-        console.log('Playlist: Get clip name', name);
+        logger.verbose('PVSLibrary Parser (playlist): getClipByName', name);
         callback(null, this.playlist.find(node => node.plnName === name));
     }
 
     getClipByCleanName(cleanName, callback) {
-        console.log('Playlist: Get clip name', cleanName);
+        logger.verbose('PVSLibrary Parser (playlist): getClipByCleanName', cleanName);
         callback(null, this.playlist.find(node => node.cleanName === cleanName));
     }
 
     getClipByIndex(index, callback) {
-        console.log('Playlist: Get clip index', index);
         if (index === -1) {
+            logger.verbose('PVSLibrary Parser (playlist): getClipByIndex. Negative Index, get last clip instead', index);
             // Get the last clip
             callback(null, this.playlist[this.playlist.length - 1]);
         } else if (index >= this.playlist.length) {
             // Get the first clip
-            console.log('get first clip');
+            logger.debug('PVSLibrary Parser (playlist): getClipByIndex at end. Get first instead');
             callback(null, this.playlist[0]);
         } else {
             // Get the clip at the specified index
+            logger.verbose('PVSLibrary Parser (playlist): getClipByIndex', index);
             callback(null, this.playlist[index]);
         }
     }
 
     selectClip(index) {
-        console.log("Playlist: setting active index to:", index);
+        logger.verbose("PVSLibrary Parser (playlist): selectClip as active:", index);
         this.playlist.forEach((node, idx) => {
             node.isSelected = (idx === index);
         });
     }
 
     setClipTimer(name, timer, timecode, callback) {
-        console.log('Playlist: Get clip name', name);
+        logger.verbose('PVSLibrary Parser (playlist): setClipTimer for', name);
         const clip = this.playlist.find(node => node.plnName === name);
     
         // Perform additional actions
         if (clip) {
-            console.log('Clip found:', clip);
+            logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip}. Set clip ${timer} to`, timecode);;
             clip[timer] = timecode; // Dynamically set the property name
-            console.log(`Set ${timer} to`, timecode);
         } else {
-            console.log('Clip not found');
+           logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', clip);
         }
     
         // If you need a callback, you can call it here

@@ -165,7 +165,7 @@ class ProVideoServerController {
 
             
         }
-        logger.debug("CTRL: updateTransportState - Transport State: " + this.transportState)
+        //logger.debug("CTRL: " + this.getLoadedNameClip() +  " is " + this.transportState + ". At " + JSON.stringify(this.getCurrentTransportTime().hours) +"h:"+ JSON.stringify(this.getCurrentTransportTime().minutes) +"m:"+  JSON.stringify(this.getCurrentTransportTime().seconds) +"s:"+ JSON.stringify(this.getCurrentTransportTime().frames) +"f");
     }
 
     clearAutoCueTimer(){
@@ -351,7 +351,7 @@ class ProVideoServerController {
     pause(){
         this.currentTimeSense()
             .then(data => {
-                logger.debug(" CTRL: Pause - pausing at ", data.data.timecode)
+                logger.debug(" CTRL: Pause - pausing at " + JSON.stringify(data.data.timecode))
                 this.cueUpData({timecode: data.data.timecode})
                     .then(data => {
                         logger.debug(" CTRL: Pause - CueUpWithData timecode to ", data.data);
@@ -371,12 +371,12 @@ class ProVideoServerController {
             .then(data => {
                 //console.log(" jumping at ", jumptime)
                 let ts = this.transportState;
-                logger.verbose("CTRL: jumpTime — Jumping ",jumptime.timecode, " from timecdoe ",  data.data.timecode)
+                logger.verbose("CTRL: jumpTime — Jumping " + JSON.stringify(jumptime.timecode) + " from timecdoe " + data.data.timecode)
                 let tc = operateTimecodes(jumptime.timecode, data.data.timecode, jumptime.operation )
                 logger.verbose('CTRL: jumpTime -  New timecode is  ', tc)
                 this.cueUpData({timecode: tc})
                     .then(data => {
-                        logger.debug("CTRL: jumpTime - Jump Success! Set timecode to ", tc, ts)
+                        logger.debug("CTRL: jumpTime - Jump Success! Set timecode to " + tc + "state reset to" + ts)
                         if (ts == "PLAYING"){
                             this.play();
                     }
@@ -542,7 +542,7 @@ class ProVideoServerController {
 
         try { 
             const response = await command.promise;
-            logger.debug('------CTRL: IDLoadedRequest - command succeeded', response);
+            logger.verbose('------CTRL: IDLoadedRequest - command succeeded', response);
             return response;
         } catch(error) {
                 logger.error('------CTRL: IDLoadedRequest -  command failed', error);
@@ -556,7 +556,7 @@ class ProVideoServerController {
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
-            logger.debug('------CTRL: currentTimeSense - command succeeded', response);
+            logger.verbose('------CTRL: currentTimeSense - command succeeded', response);
             return response;
         } catch(error) {
                 logger.error('------CTRL: currentTimeSense - command failed', error);
