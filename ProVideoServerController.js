@@ -639,7 +639,7 @@ class ProVideoServerController {
         return this.libraryParser.selectClip(index);
     }
 
-    //set a clip as selected
+    //get a clip as selected
    getClipSelected(callback) {
         logger.verbose("CTRL: Called get selected active clip");
         return this.libraryParser.getClipSelected(callback);
