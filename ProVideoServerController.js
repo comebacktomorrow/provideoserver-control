@@ -145,7 +145,7 @@ class ProVideoServerController {
             if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null) {
                 this.setAutoCueTimer();
               }
-        } else if (this.isPlaying(this.currentTimecode)) {
+        } else if (this.isPlaying(this.currentTimecode) && this.transportState != 'CUEING') {
             this.transportState = 'PLAYING';
             this.clearAutoCueTimer();
         } else {
@@ -481,6 +481,7 @@ class ProVideoServerController {
         try { 
             const response = await command.promise;
             logger.debug('------CTRL: cueUpData - command succeeded', data, response);
+            this.transportState = 'CUEING';
             return response;
         } catch(error) {
                 logger.error('------CTRL: cueUpData - command failed', error);
