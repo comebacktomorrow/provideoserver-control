@@ -44,11 +44,14 @@ function handleRangeChange(value) {
 }
 
 function updateStatus(data) {
+    const clipInfo = getClipInfoByName(data.clipName);
+
     document.getElementById('state').innerText = data.state;
-    document.getElementById('timecode').innerText = timecodeToString(data.timecode);
+    document.getElementById('current-timecode').innerText = timecodeToString(data.timecode);
+    document.getElementById('current-duration').innerText = timecodeToString(clipInfo.duration);
     document.getElementById('clipName').innerText = data.clipName;
 
-    const clipInfo = getClipInfoByName(data.clipName);
+    
     if (clipInfo) {
         highlightClip(clipInfo);
         displayClipInfo(clipInfo);
@@ -76,14 +79,14 @@ function highlightClip(clipInfo) {
     }
 }
 
-function displayClipInfo(clipInfo) {
-    selectedClipDurationFrames = timecodeToTotalFrames(clipInfo.duration, parseFloat(clipInfo.fps));
-    document.getElementById('clip-duration').innerText = `Duration: ${timecodeToString(clipInfo.duration)}`;
-    document.getElementById('clip-playbackBehavior').innerText = `Mode: ${clipInfo.playbackBehavior}`;
-    document.getElementById('clip-fps').innerText = `FPS: ${parseFloat(clipInfo.fps).toFixed(2)}`;
-    document.getElementById('clip-formatString').innerText = `Format: ${clipInfo.formatString}`;
-    document.getElementById('clip-sizeString').innerText = `Size: ${clipInfo.sizeString}`;
-}
+ function displayClipInfo(clipInfo) {
+     selectedClipDurationFrames = timecodeToTotalFrames(clipInfo.duration, parseFloat(clipInfo.fps));
+//     document.getElementById('clip-duration').innerText = `Duration: ${timecodeToString(clipInfo.duration)}`;
+//     document.getElementById('clip-playbackBehavior').innerText = `Mode: ${clipInfo.playbackBehavior}`;
+//     document.getElementById('clip-fps').innerText = `FPS: ${parseFloat(clipInfo.fps).toFixed(2)}`;
+//     document.getElementById('clip-formatString').innerText = `Format: ${clipInfo.formatString}`;
+//     document.getElementById('clip-sizeString').innerText = `Size: ${clipInfo.sizeString}`;
+ }
 
 function play() {
     fetch('/API/PVS/transport/play', { method: 'POST' })
@@ -215,6 +218,13 @@ function fetchPlaylist() {
             });
         })
         .catch(error => updateResponse('Error fetching playlist: ' + error));
+    }
+
+    function loadClipByCleanName(cleanName) {
+        fetch(`/API/PVS/timeline/active/clean-name/${encodeURIComponent(cleanName)}`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => updateResponse(JSON.stringify(data.message)))
+            .catch(error => updateResponse('Error loading clip: ' + error));
     }
         
         fetchPlaylist(); // Initial fetch of the playlist

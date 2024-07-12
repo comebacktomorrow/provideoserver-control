@@ -21,19 +21,19 @@
         <p>Clip Name: <span id="clipName">N/A</span></p>
     </div>
     <div id="timeline">
-        <span id="current-timecode">00:00:00:00</span>
+        <span class="counter" id="current-timecode">00:00:00:00</span>
         <input type="range" id="timecodeRange" value="0" min="0" max="100" onclick="handleRangeChange(this.value)">
-        <span id="current-duration">00:00:00:00</span>
+        <span class="counter" id="current-duration">00:00:00:00</span>
     </div>
     <div id="response"></div>
-    <div id="clip-info">
+    <!-- <div id="clip-info">
         <h3>Selected Clip Information:</h3>
         <p id="clip-duration">Duration: N/A</p>
         <p id="clip-playbackBehavior">Mode: N/A</p>
         <p id="clip-fps">FPS: N/A</p>
         <p id="clip-formatString">Format: N/A</p>
         <p id="clip-sizeString">Size: N/A</p>
-    </div>
+    </div> -->
     <div id="playlist"></div>
     <script src="scripts.js"></script>
 </body>
