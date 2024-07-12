@@ -2,8 +2,8 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const ProVideoServerController = require("../ProVideoServerController");
 const initializeWebSocket = require("./websocket");
+const path = require('path');
 const playlistRoutes = require("./routes/playlistRoutes");
 const timelineRoutes = require("./routes/timelineRoutes");
 const transportRoutes = require("./routes/transportRoutes");
@@ -17,6 +17,9 @@ const startWebServer = (controller) => {
 
   // Make the controller globally available for routes
   app.set("controller", controller);
+
+  // Serve static files from the public directory
+  app.use(express.static(path.join(__dirname, '../public')));
 
   app.use(express.json());
   app.use("/API/PVS/playlist", playlistRoutes);
