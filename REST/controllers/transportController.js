@@ -4,25 +4,37 @@ const { secondsToTimecode } = require('../../utilities');
 exports.play = (req, res) => {
     const controller = req.app.get('controller');
     controller.play();
-    res.status(200).send('Playing');
+    const response = {
+        message: 'Play'
+    };
+    res.status(200).json(response);
 };
 
 exports.pause = (req, res) => {
     const controller = req.app.get('controller');
     controller.pause();
-    res.status(200).send('Paused');
+    const response = {
+        message: 'Paused'
+    };
+    res.status(200).json(response);
 };
 
 exports.stop = (req, res) => {
     const controller = req.app.get('controller');
     controller.stop();
-    res.status(200).send('Stopped');
+    const response = {
+        message: 'Stop'
+    };
+    res.status(200).json(response);
 };
 
 exports.toggle = (req, res) => {
     const controller = req.app.get('controller');
     controller.togglePlayback();
-    res.status(200).send('Toggled');
+    const response = {
+        message: 'Toggle'
+    };
+    res.status(200).json(response);
 };
 
 exports.jumpTime = (req, res) => {
@@ -34,7 +46,10 @@ exports.jumpTime = (req, res) => {
         }
     let t = secondsToTimecode(time)
     controller.jumpTime({timecode: t, operation: op});
-    res.status(200).send(`Jumped to ${time}`);
+    const response = {
+        message: `Jumped to ${time}`
+    };
+    res.status(200).send(response);
 };
 
 exports.jumpBack = (req, res) => {
@@ -42,6 +57,17 @@ exports.jumpBack = (req, res) => {
     const { time } = req.params;
     controller.jumpBack({timecode: secondsToTimecode(time)});
     res.status(200).send(`Jumped back ${time}`);
+};
+
+exports.jumpBack = (req, res) => {
+    const controller = req.app.get('controller');
+    const { time } = req.params;
+    let t = secondsToTimecode(time)
+    controller.jumpBack({timecode: t});
+    const response = {
+        message: time
+    };
+    res.status(200).send(response);
 };
 
 //// we're here
