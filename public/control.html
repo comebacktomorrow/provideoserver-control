@@ -8,13 +8,13 @@
 </head>
 <body>
     <h1>ProVideoServer Controller</h1>
-    <button onclick="play()">Play</button>
-    <button onclick="pause()">Pause</button>
-    <button onclick="stop()">Stop</button>
-    <button onclick="toggle()">Toggle</button>
-    <button onclick="queueNext()">Next</button>
-    <button onclick="queuePrevious()">Previous</button>
-    <button onclick="requeue()">Requeue</button>
+    <button id="playButton" class="button play" onclick="play()">&#9658;</button>  <!-- Play symbol -->
+<button id="pauseButton" class="button pause" onclick="pause()">&#10074;&#10074;</button>  <!-- Pause symbol -->
+<button id="stopButton" class="button stop" onclick="stop()">&#9632;</button>  <!-- Stop symbol -->
+    <button id="toggleButton" class="button toggle" onclick="toggle()">Toggle</button>
+    <button onclick="queueNext()">&#9654;&#9654;</button>
+    <button onclick="queuePrevious()">&#9664;&#9664;</button>
+    <button onclick="requeue()">&#8635;</button>
     <div id="status">
         <p>State: <span id="state">N/A</span></p>
         <p>Timecode: <span id="timecode">00:00:00:00</span></p>
@@ -26,14 +26,6 @@
         <span class="counter" id="current-duration">00:00:00:00</span>
     </div>
     <div id="response"></div>
-    <!-- <div id="clip-info">
-        <h3>Selected Clip Information:</h3>
-        <p id="clip-duration">Duration: N/A</p>
-        <p id="clip-playbackBehavior">Mode: N/A</p>
-        <p id="clip-fps">FPS: N/A</p>
-        <p id="clip-formatString">Format: N/A</p>
-        <p id="clip-sizeString">Size: N/A</p>
-    </div> -->
     <div id="playlist"></div>
     <script src="scripts.js"></script>
 </body>

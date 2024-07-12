@@ -43,6 +43,37 @@ function handleRangeChange(value) {
     });
 }
 
+    const playButton = document.getElementById('playButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const stopButton = document.getElementById('stopButton');
+    const toggleButton = document.getElementById('toggleButton');
+
+function updateTransportButtonState(data) {
+    
+
+    // Reset all buttons to default state
+    playButton.classList.remove('active');
+    pauseButton.classList.remove('active');
+    stopButton.classList.remove('active');
+    toggleButton.classList.remove('play');
+    toggleButton.classList.remove('pause');
+
+    // Update the active button based on data.state
+    if (data.state === 'PLAYING') {
+        playButton.classList.add('active');
+        toggleButton.innerText = '\u23F8';
+        toggleButton.classList.add('pause');
+    } else if (data.state === 'PAUSED') {
+        pauseButton.classList.add('active');
+        toggleButton.innerText = '\u25B6';  // Unicode for Play symbol (▶)
+        toggleButton.classList.add('play');
+    } else {
+        stopButton.classList.add('active');
+        toggleButton.innerText = '\u25B6';  // Unicode for Play symbol (▶)
+        toggleButton.classList.add('play');
+    }
+}
+
 function updateStatus(data) {
     const clipInfo = getClipInfoByName(data.clipName);
 
@@ -51,7 +82,9 @@ function updateStatus(data) {
     document.getElementById('current-duration').innerText = timecodeToString(clipInfo.duration);
     document.getElementById('clipName').innerText = data.clipName;
 
+    updateTransportButtonState(data)
     
+
     if (clipInfo) {
         highlightClip(clipInfo);
         displayClipInfo(clipInfo);
@@ -79,14 +112,10 @@ function highlightClip(clipInfo) {
     }
 }
 
- function displayClipInfo(clipInfo) {
-     selectedClipDurationFrames = timecodeToTotalFrames(clipInfo.duration, parseFloat(clipInfo.fps));
-//     document.getElementById('clip-duration').innerText = `Duration: ${timecodeToString(clipInfo.duration)}`;
-//     document.getElementById('clip-playbackBehavior').innerText = `Mode: ${clipInfo.playbackBehavior}`;
-//     document.getElementById('clip-fps').innerText = `FPS: ${parseFloat(clipInfo.fps).toFixed(2)}`;
-//     document.getElementById('clip-formatString').innerText = `Format: ${clipInfo.formatString}`;
-//     document.getElementById('clip-sizeString').innerText = `Size: ${clipInfo.sizeString}`;
- }
+function displayClipInfo(clipInfo) {
+    selectedClipDurationFrames = timecodeToTotalFrames(clipInfo.duration, parseFloat(clipInfo.fps));
+    // Update clip info display logic here if needed
+}
 
 function play() {
     fetch('/API/PVS/transport/play', { method: 'POST' })

@@ -137,3 +137,65 @@ button:hover {
     border-radius: 5px;
     color: white;
 }
+
+
+
+
+
+
+
+/* Play button specific styles */
+.button.play {
+    background-color: #2c8b00;
+}
+
+/* Pause button specific styles */
+.button.pause  {
+    background-color: #7d6600;
+}
+
+/* Stop button specific styles */
+.button.stop {
+    background-color: #770000;
+}
+
+/* Toggle button specific styles */
+
+
+/* Active state styles */
+.button.active.play, .button.toggle.play {
+    background-color: #00ce18;
+    color: #ffffff;
+    border-color: #007bff;
+}
+
+.button.active.stop {
+    background-color: #ff0000;
+    color: #ffffff;
+    border-color: #007bff;
+}
+
+.button.active.pause, .button.toggle.pause {
+    background-color: #ff9500;
+    color: #ffffff;
+    border-color: #007bff;
+}
+
+.button.play:hover,
+.button.play:focus,
+.button.toggle.play:hover,
+.button.toggle.play:focus  {
+    background-color: #29af00;
+}
+
+.button.pause:hover,
+.button.pause:focus,
+.button.toggle.pause:hover,
+.button.toggle.pause:focus  {
+    background-color: #c08300;
+}
+
+.button.stop:hover,
+.button.stop:focus {
+    background-color: #910000;
+}
