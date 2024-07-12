@@ -40,6 +40,28 @@ button:hover {
     transition: opacity .2s;
 }
 
+#timecodeRange:hover {
+    opacity: 1;
+}
+
+#timecodeRange::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+}
+
+#timecodeRange::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+}
+
 .playlist-item {
     background-color: #393939;
     border: 1px solid #ddd;

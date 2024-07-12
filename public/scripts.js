@@ -21,6 +21,28 @@ function timecodeToTotalFrames(timecode, fps) {
     return (timecode.hours * 3600 + timecode.minutes * 60 + timecode.seconds) * fps + timecode.frames;
 }
 
+function handleRangeChange(value) {
+    const percentage = value / 100; // Convert range value to percentage (0-1)
+    const requestBody = {
+        timecode: { percentage }
+    };
+
+    fetch('http://localhost:5050/API/PVS/transport/times/playhead', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateResponse(JSON.stringify(data));
+    })
+    .catch(error => {
+        updateResponse('Error jumping to percentage: ' + error);
+    });
+}
+
 function updateStatus(data) {
     document.getElementById('state').innerText = data.state;
     document.getElementById('timecode').innerText = timecodeToString(data.timecode);

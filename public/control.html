@@ -20,7 +20,11 @@
         <p>Timecode: <span id="timecode">00:00:00:00</span></p>
         <p>Clip Name: <span id="clipName">N/A</span></p>
     </div>
-    <input type="range" id="timecodeRange" value="0" min="0" max="100" disabled>
+    <div id="timeline">
+        <span id="current-timecode">00:00:00:00</span>
+        <input type="range" id="timecodeRange" value="0" min="0" max="100" onclick="handleRangeChange(this.value)">
+        <span id="current-duration">00:00:00:00</span>
+    </div>
     <div id="response"></div>
     <div id="clip-info">
         <h3>Selected Clip Information:</h3>
