@@ -1,4 +1,5 @@
 let playlistData = [];
+let selectedClipDurationFrames = 0;
 
 function updateResponse(responseText) {
     const responseDiv = document.getElementById('response');
@@ -16,6 +17,10 @@ function timecodeToString(timecode) {
     return `${hours}:${minutes}:${seconds}:${frames}`;
 }
 
+function timecodeToTotalFrames(timecode, fps) {
+    return (timecode.hours * 3600 + timecode.minutes * 60 + timecode.seconds) * fps + timecode.frames;
+}
+
 function updateStatus(data) {
     document.getElementById('state').innerText = data.state;
     document.getElementById('timecode').innerText = timecodeToString(data.timecode);
@@ -25,6 +30,12 @@ function updateStatus(data) {
     if (clipInfo) {
         highlightClip(clipInfo);
         displayClipInfo(clipInfo);
+    }
+
+    if (selectedClipDurationFrames > 0) {
+        const currentFrames = timecodeToTotalFrames(data.timecode, parseFloat(clipInfo.fps));
+        const progress = Math.min(currentFrames / selectedClipDurationFrames * 100, 100);
+        document.getElementById('timecodeRange').value = progress;
     }
 }
 
@@ -44,6 +55,7 @@ function highlightClip(clipInfo) {
 }
 
 function displayClipInfo(clipInfo) {
+    selectedClipDurationFrames = timecodeToTotalFrames(clipInfo.duration, parseFloat(clipInfo.fps));
     document.getElementById('clip-duration').innerText = `Duration: ${timecodeToString(clipInfo.duration)}`;
     document.getElementById('clip-playbackBehavior').innerText = `Mode: ${clipInfo.playbackBehavior}`;
     document.getElementById('clip-fps').innerText = `FPS: ${parseFloat(clipInfo.fps).toFixed(2)}`;
