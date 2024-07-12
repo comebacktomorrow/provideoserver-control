@@ -27,9 +27,32 @@ button:hover {
     margin-top: 20px;
 }
 
-#timecodeRange {
+@font-face {
+    font-family: 'SpaceMonoBold';
+    src: url('fonts/Space_Mono/SpaceMono-Bold.ttf');
+    font-weight: bold;
+    font-style: normal;
+}
+
+#timeline {
     width: 100%;
-    margin-top: 10px;
+    display: flex;
+    padding: 15px;
+}
+
+#timeline *{
+    margin: 15px;
+}
+
+#timeline .counter {
+    width: fit-content;
+    font-family: 'SpaceMonoBold';
+    font-size: 2em;
+    
+}
+
+#timecodeRange {
+    margin: 15px;
     -webkit-appearance: none;
     appearance: none;
     height: 8px;
@@ -38,6 +61,9 @@ button:hover {
     outline: none;
     opacity: 0.7;
     transition: opacity .2s;
+    flex-grow: 1;
+    padding: 2px;
+
 }
 
 #timecodeRange:hover {
