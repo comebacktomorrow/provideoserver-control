@@ -6,13 +6,24 @@ function initializeWebSocket(server, controller) {
     wss.on('connection', (ws) => {
         console.log('Client connected');
 
-        setInterval(sendUpdates, 1000);
+        let previousState = null;
+        let previousTimecode = null;
+        let previousClipName = null;
+        let previousLibraryTimestamp = null;
+        let forceUpdate = false;
+
+        const forceUpdateInterval = setInterval(() => {
+            forceUpdate = true;
+        }, 10000); // Set the force update flag every 10 seconds
+
+        const updateInterval = setInterval(sendUpdates, 50); // Check for updates every second
 
         // Send initial state, timecode, and clip name
         ws.send(JSON.stringify({
             state: controller.getTransportState(),
             timecode: controller.getCurrentTransportTime(),
-            clipName:  controller.getLoadedNameClip()
+            clipName: controller.getLoadedNameClip(),
+            libraryTimestamp: controller.getLibraryTimestamp()
         }));
 
         ws.on('message', (message) => {
@@ -21,16 +32,58 @@ function initializeWebSocket(server, controller) {
 
         ws.on('close', () => {
             console.log('Client disconnected');
+            clearInterval(updateInterval);  // Clear the interval on disconnect
+            clearInterval(forceUpdateInterval);  // Clear the force update interval on disconnect
+        });
+
+        ws.on('error', (error) => {
+            console.error('WebSocket error:', error);
         });
 
         // Function to send updates
         function sendUpdates() {
             if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    state: controller.getTransportState(),
-                    timecode: controller.getCurrentTransportTime(),
-                    clipName: controller.getLoadedNameClip()
-                }));
+                const state = controller.getTransportState();
+                const timecode = controller.getCurrentTransportTime();
+                const clipName = controller.getLoadedNameClip();
+                const libraryTimestamp = controller.getLibraryTimestamp();
+
+                // Check if any data has changed
+                const hasChanged = (
+                    state !== previousState ||
+                    JSON.stringify(timecode) !== JSON.stringify(previousTimecode) ||
+                    clipName !== previousClipName ||
+                    libraryTimestamp !== previousLibraryTimestamp
+                );
+
+                if (hasChanged || forceUpdate) {
+                    const message = {
+                        state,
+                        timecode,
+                        clipName,
+                        libraryTimestamp
+                    };
+
+                    // Log the message to be sent
+                    //console.log('Sending WebSocket message:', message);
+
+                    try {
+                        ws.send(JSON.stringify(message));
+
+                        // Update previous values
+                        previousState = state;
+                        previousTimecode = timecode;
+                        previousClipName = clipName;
+                        previousLibraryTimestamp = libraryTimestamp;
+
+                        // Reset force update flag
+                        forceUpdate = false;
+                    } catch (error) {
+                        console.error('WebSocket send error:', error);
+                    }
+                }
+            } else {
+                console.log('WebSocket is not open. Ready state:', ws.readyState);
             }
         }
 

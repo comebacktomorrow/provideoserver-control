@@ -11,9 +11,14 @@ const transportTimeRoutes = require("./routes/transportTimeRoutes");
 const navigationRoutes = require("./routes/navigationRoutes");
 
 const startWebServer = (controller) => {
-  const app = express();
-  const server = http.createServer(app);
-  const io = socketIo(server);
+    const app = express();
+    const server = http.createServer(app);
+    const io = socketIo(server, {
+      cors: {
+        origin: '*', // Allow connections from any origin
+        methods: ["GET", "POST"]
+      }
+    });
 
   // Make the controller globally available for routes
   app.set("controller", controller);
