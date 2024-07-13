@@ -276,7 +276,7 @@ class PVSLibraryParser {
         });
     }
 
-    setClipTimer(name, timer, timecode, callback) {
+    setClipTimerByClipName(name, timer, timecode, callback) {
         logger.verbose('PVSLibrary Parser (playlist): setClipTimer for', name);
         const clip = this.playlist.find(node => node.plnName === name);
     
@@ -290,6 +290,28 @@ class PVSLibraryParser {
     
         // If you need a callback, you can call it here
         callback(null, clip);
+    }
+
+    setClipTimerByClipIndex(index, timer, timecode, callback) {
+        logger.verbose('PVSLibrary Parser (playlist): setClipTimer for', index);
+        const clip = this.playlist[index];
+        console.log(JSON.stringify(clip));
+        // Perform additional actions
+        if (clip) {
+            logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip.cleanName}. Set clip ${timer} to ${timecode}`);;
+            clip[timer] = timecode; // Dynamically set the property name
+             // If you need a callback, you can call it here
+            callback(null, clip);
+        } else {
+           logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', clip);
+        }
+    
+       
+        
+    }
+
+    getLibraryUpdate() {
+        return this.libraryUpdate;
     }
     
 

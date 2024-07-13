@@ -49,9 +49,14 @@ exports.getClipByCleanName = (req, res) => {
 exports.updateClipTimersById = (req, res) => {
     const controller = req.app.get('controller');
     const { id } = req.params;
-    const { timerName, timecode } = req.body;
-    controller.updateClipTimersById(id, timerName, timecode);
-    res.status(200).send('Clip timer updated');
+    
+    const { timer, timecode } = req.body;
+    controller.setClipTimerByIndex(id, timer, timecode, (err, clip) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(clip);
+    })
 };
 
 exports.updateClipTimersByName = (req, res) => {
@@ -66,6 +71,6 @@ exports.updateClipTimersByCleanName = (req, res) => {
     const controller = req.app.get('controller');
     const { cleanName } = req.params;
     const { timerName, timecode } = req.body;
-    controller.updateClipTimersByCleanName(cleanName, timerName, timecode);
+    controller.updateClipTimerByCleanName(cleanName, timerName, timecode);
     res.status(200).send('Clip timer updated');
 };
