@@ -20,6 +20,8 @@ class ProVideoServerController {
         this.clocks = [];
         this.previousTime = null; // Previous state for time
         this.transportState = 'STOPPED'; // Initialize transport state
+        this.libraryTimestamp = 0;
+
 
         //this.currentClipObj = [];
 
@@ -41,6 +43,7 @@ class ProVideoServerController {
                     console.error(err);
                     return;
                 }
+               this.libraryTimestamp = this.libraryParser.getLibraryUpdate();
 
         });
     }
@@ -68,6 +71,7 @@ class ProVideoServerController {
                 this.updateTransportState();
                 let header = "CTRL: POLL -  ";
                 logger.info(header +  this.getTransportState()  + ' of '+this.currentClip.duration )
+                this.setLibraryTimestamp();
             } catch (error) {
                 logger.warn('Error during polling:', error);
             }
@@ -78,10 +82,10 @@ class ProVideoServerController {
         clearInterval(this.pollInterval);
     }
 
-    async updateLoadedClipPlaylistData() {
+    async updateLoadedClipPlaylistData(force = false) {
         try {
             const data = await this.IDLoadedRequest();
-            if (data.data.clipname[0] != this.currentClip.plnName){
+            if (data.data.clipname[0] != this.currentClip.plnName || force === true){
                 logger.debug("CTRL: POLL - IDLoadRequest mismatch - a different clip has been loaded")
                 //this.currentClip = await this.getClipByName(data.data.clipname[0], (err, clip));
                 this.getClipByName(data.data.clipname[0], (err, clip) => {
@@ -677,6 +681,18 @@ class ProVideoServerController {
     setClipTimer(clipname, timer, timecode, callback) {
         logger.verbose("CTRL: Called set timer for clip", clipname);
         return this.libraryParser.setClipTimer(clipname, timer.timecode, timecode, callback);
+    getLibraryTimestamp() {
+        return this.libraryTimestamp;
+    }
+
+    setLibraryTimestamp() {
+        const newTime = this.libraryParser.getLibraryUpdate();
+        const oldTime = this.libraryTimestamp
+        if (newTime!= oldTime) {
+            this.libraryTimestamp = newTime
+            logger.verbose("new timestamp is " + newTime);
+            updateLoadedClipPlaylistData(true);
+        }
     }
 
 

@@ -6,12 +6,14 @@ const xml2js = require('xml2js');
 const { operateTimecodes } = require('./utilities');
 const logger = require('./logger');
 
+
 class PVSLibraryParser {
     constructor(channelNumber) {
         this.channelNumber = channelNumber;
         this.homeDirectory = process.env.HOME || process.env.USERPROFILE;
         this.playlistFilePath = path.join(this.homeDirectory, 'Documents/ProVideoServer.pvs3');
         this.playlist = [];
+        this.libraryUpdate = 0;
         
         this.setupFileWatcher();
     }
@@ -74,7 +76,7 @@ class PVSLibraryParser {
                     }
     
                     logger.debug("Library Parser: Load Play List - loaded playlist sucessfully")
-                    resolve(playlistNodes);
+                    this.libraryUpdate = Date.now();
                 });
             });
         });
