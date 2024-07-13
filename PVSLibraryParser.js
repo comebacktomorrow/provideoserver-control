@@ -16,17 +16,22 @@ class PVSLibraryParser {
         this.setupFileWatcher();
     }
 
+    // we set a high stability threshold because it seems like PVP writes twice
     setupFileWatcher() {
         // Initialize chokidar watcher
         this.watcher = chokidar.watch(this.playlistFilePath, {
-            persistent: true
+            persistent: true,
+            awaitWriteFinish: {
+                stabilityThreshold: 3000
+              },
         });
 
         // Add event listeners
         this.watcher.on('change', (path) => {
-            logger.debug(`Library Parser: Watcher - ${path} has changed`);
+            logger.debug(`Library Parser: Library Update - ${path} has changed`);
             this.loadPlaylist();
         });
+    
 
         logger.debug(`Library Parser: Watcher - Watching for changes in ${this.playlistFilePath}`);
     }
