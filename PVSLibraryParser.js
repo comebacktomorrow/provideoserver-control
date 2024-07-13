@@ -45,10 +45,13 @@ class PVSLibraryParser {
                         reject(err);
                         return;
                     }
-    
+                    // Channel is currently hardcoded
                     const channels = result.PVSPlaylist.array[0].PVSChannel;
                     let playlistNodes = [];
     
+                    //we need a better way to merge information
+                    //mostly we care about correct indexing, and playBack behaviour
+                    //it's possible we need to watch UUIDs :( 
                     if (channels) {
                         channels.forEach(channel => {
                             if (channel.$.channelNumber === this.channelNumber.toString()) {
