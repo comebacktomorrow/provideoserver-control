@@ -41,17 +41,4 @@ function initializeWebSocket(server, controller) {
     console.log('WebSocket server is running');
 }
 
-// // Dummy functions for demonstration purposes
-// function getCurrentState() {
-//     return 'playing'; // Replace with actual state retrieval
-// }
-
-// function getCurrentTimecode() {
-//     return '00:00:00:00'; // Replace with actual timecode retrieval
-// }
-
-// function getCurrentClipName() {
-//     return 'Sample Clip'; // Replace with actual clip name retrieval
-// }
-
 module.exports = initializeWebSocket;
