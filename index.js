@@ -17,4 +17,9 @@ const controller = new ProVideoServerController(PVS_IP_ADDRESS, PVS_PORT, PVS_CH
 // Start the interactive console
 startInteractiveConsole(controller);
 
-// Start the web serverstartWebServer(controller);setInterval(() => {    updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);}, 1000);
+// Start the web server
+startWebServer(controller);
+
+setInterval(() => {
+    updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
+}, 1000);
