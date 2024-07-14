@@ -12,7 +12,7 @@ class ProVideoServerController {
         this.commandQueue = new AMPCommandQueue();
         this.tcpClient.setController(this); // Pass the controller to the TCP client
         this.libraryParser = new PVSLibraryParser(channelNumber); // Initialize PVSLibraryParser with the channel number
-
+        
 
         this.currentClip = { plnName: ""}; // State for current clip
         this.previousClip = null; // Previous state for clip
@@ -50,37 +50,29 @@ class ProVideoServerController {
 
     //roughy works
     //still need to convert T1 \ T2 \ TRT to timecode - actually need quite a bit more work
+    // adding and subtracting time calculation is way messedup -- maybe?
+    // also don't know what happens when the playlist is refreshed to custom set times
+    
+   
     
     
+    // we should return timecode, state, loaded clip id, and a playlistupdated flag on regular updates
+
+    // we need to handle things better when they're not found
+    // pay particular attention to the rest endpoints
     
-    
+
+
+     // we might need a way to handle jump states a "SEEKING STATE"  - done?
     //need set and clear trt functions
     //need to deal with playlist updates
 
     //jumpBack function - done
+    // should have a toggle function for playback - done
 
     // Fixed
     //isAlmostAtEnd - and fix dodgy end timecodes // fixed - we were missing a timecode rate
     // now we just need a way to calculate playback percerntage and if we're in 0.1% of that and paused move to next clip
-
-    startPolling() {
-        this.pollInterval = setInterval(async () => {
-            try {
-                await this.updateLoadedClipPlaylistData();
-                await this.updateCurrentTimecode();
-                this.updateTransportState();
-                let header = "CTRL: POLL -  ";
-                logger.info(header +  this.getTransportState()  + ' of '+this.currentClip.duration )
-                this.setLibraryTimestamp();
-            } catch (error) {
-                logger.warn('Error during polling:', error);
-            }
-        }, 1000); // Adjust the interval as needed
-    }
-
-    stopPolling() {
-        clearInterval(this.pollInterval);
-    }
 
     async updateLoadedClipPlaylistData(force = false) {
         try {
@@ -97,6 +89,7 @@ class ProVideoServerController {
                                 this.currentClip = clip;
                                 //this.currentClipObj = data.data;
                                 this.setClipSelected(clip.index);
+                                return true;
                             }
                         });
                 //this.setClipSelected(this.currentClip.index);
@@ -106,6 +99,42 @@ class ProVideoServerController {
         }
     }
 
+    startPolling() {
+        this.pollInterval = setInterval(async () => {
+            try {
+                await this.updateLoadedClipPlaylistData();
+                await this.updateCurrentTimecode();
+                this.updateTransportState();
+                this.setLibraryTimestamp();
+                logger.info("CTRL: " + this.getLoadedNameClip() +  " is " + this.transportState + ". At " + JSON.stringify(this.getCurrentTransportTime().hours) +"h:"+ JSON.stringify(this.getCurrentTransportTime().minutes) +"m:"+  JSON.stringify(this.getCurrentTransportTime().seconds) +"s:"+ JSON.stringify(this.getCurrentTransportTime().frames) +"f");
+                
+
+                
+                let tD = this.clocks.remaining;
+                let t1 = this.clocks.t1; // is actually time remaining
+                let t2 = this.clocks.t2;// is actually time remaining
+                let trt = this.clocks.trt;// is actually time remaining
+
+                
+
+                let tD_string = "REMAINING: " + JSON.stringify(tD.hours) +"h:"+ JSON.stringify(tD.minutes) +"m:"+  JSON.stringify(tD.seconds) +"s:"+ JSON.stringify(tD.frames) +"f ";
+                let t1_string = "T1: " + JSON.stringify(t1.hours) +"h:"+ JSON.stringify(t1.minutes) +"m:"+  JSON.stringify(t1.seconds) +"s:"+ JSON.stringify(t1.frames) +"f ";
+                let t2_string = "T2: " + JSON.stringify(t2.hours) +"h:"+ JSON.stringify(t2.minutes) +"m:"+  JSON.stringify(t2.seconds) +"s:"+ JSON.stringify(t2.frames) +"f ";
+                let trt_string = "TRT: " + JSON.stringify(trt.hours) +"h:"+ JSON.stringify(trt.minutes) +"m:"+  JSON.stringify(trt.seconds) +"s:"+ JSON.stringify(trt.frames) +"f ";
+                logger.info(tD_string + ' ' + t1_string + ' ' + t2_string + ' ' + trt_string);
+
+            } catch (error) {
+                logger.warn('Error during polling:', error);
+            }
+        }, 50); // Adjust the interval as needed
+    }
+
+    stopPolling() {
+        clearInterval(this.pollInterval);
+    }
+
+    
+
     async updateCurrentTimecode() {
         try {
             //logger.debug("UPDATE TIMECODE!")
@@ -113,9 +142,11 @@ class ProVideoServerController {
             this.currentTimecode = data.data.timecode;
             this.currentTime = data.data.timecode;
             this.clocks.currentTimecode = data.data.timecode;
+            // this works out the time remainging on the clip
             this.clocks.t1 = operateTimecodes(data.data.timecode, this.currentClip.t1,'subtract' , this.currentClip.fps)
             this.clocks.t2 = operateTimecodes(data.data.timecode, this.currentClip.t2,'subtract' , this.currentClip.fps)
             this.clocks.trt = operateTimecodes(data.data.timecode, this.currentClip.trt,'subtract' , this.currentClip.fps)
+            this.clocks.remaining = operateTimecodes(data.data.timecode, this.currentClip.duration,'subtract' , this.currentClip.fps)
             //console.log("CLIP *******************************************",this.currentClip);
             //console.log("TC NOW", this.currentTimecode);
             //console.log("UPDATE TIMECODE : T1 ", this.clocks.t1);
