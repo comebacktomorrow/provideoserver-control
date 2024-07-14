@@ -284,6 +284,7 @@ class PVSLibraryParser {
         if (clip) {
             logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip}. Set clip ${timer} to`, timecode);;
             clip[timer] = timecode; // Dynamically set the property name
+            this.libraryUpdate = Date.now(); // Trigger a virtual update of the playlist time
         } else {
            logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', clip);
         }
@@ -300,6 +301,7 @@ class PVSLibraryParser {
         if (clip) {
             logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip.cleanName}. Set clip ${timer} to ${timecode}`);;
             clip[timer] = timecode; // Dynamically set the property name
+            this.libraryUpdate = Date.now(); // Trigger a virtual update of the playlist time
              // If you need a callback, you can call it here
             callback(null, clip);
         } else {
