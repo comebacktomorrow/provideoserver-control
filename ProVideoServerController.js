@@ -742,6 +742,11 @@ class ProVideoServerController {
         this.tallyState = state;
     }
 
+    getTallyState(state){
+        //console.log("setting tally state to " + state)
+        return this.tallyState;
+    }
+
 
 }
 

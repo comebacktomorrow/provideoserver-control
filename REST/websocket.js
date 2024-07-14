@@ -11,6 +11,7 @@ function initializeWebSocket(server, controller) {
         let previousClipName = null;
         let previousLibraryTimestamp = null;
         let forceUpdate = false;
+        let previousTally = -1;
 
         const forceUpdateInterval = setInterval(() => {
             forceUpdate = true;
@@ -23,7 +24,8 @@ function initializeWebSocket(server, controller) {
             state: controller.getTransportState(),
             timecode: controller.getCurrentTransportTime(),
             clipName: controller.getLoadedNameClip(),
-            libraryTimestamp: controller.getLibraryTimestamp()
+            libraryTimestamp: controller.getLibraryTimestamp(),
+            tallyState: controller.getTallyState()
         }));
 
         ws.on('message', (message) => {
@@ -47,13 +49,15 @@ function initializeWebSocket(server, controller) {
                 const timecode = controller.getCurrentTransportTime();
                 const clipName = controller.getLoadedNameClip();
                 const libraryTimestamp = controller.getLibraryTimestamp();
+                const tallyState =controller.getTallyState()
 
                 // Check if any data has changed
                 const hasChanged = (
                     state !== previousState ||
                     JSON.stringify(timecode) !== JSON.stringify(previousTimecode) ||
                     clipName !== previousClipName ||
-                    libraryTimestamp !== previousLibraryTimestamp
+                    libraryTimestamp !== previousLibraryTimestamp ||
+                    tallyState != previousTally
                 );
 
                 if (hasChanged || forceUpdate) {
@@ -61,7 +65,8 @@ function initializeWebSocket(server, controller) {
                         state,
                         timecode,
                         clipName,
-                        libraryTimestamp
+                        libraryTimestamp,
+                        tallyState
                     };
 
                     // Log the message to be sent
@@ -75,6 +80,7 @@ function initializeWebSocket(server, controller) {
                         previousTimecode = timecode;
                         previousClipName = clipName;
                         previousLibraryTimestamp = libraryTimestamp;
+                        previousTally = tallyState;
 
                         // Reset force update flag
                         forceUpdate = false;
