@@ -51,7 +51,7 @@ exports.updateClipTimersById = (req, res) => {
     const { id } = req.params;
     
     const { timer, timecode } = req.body;
-    controller.setClipTimerByIndex(id, timer, timecode, (err, clip) => {
+    controller.setClipTimerByClipIndex(id, timer, timecode, (err, clip) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -63,7 +63,7 @@ exports.updateClipTimersByName = (req, res) => {
     const controller = req.app.get('controller');
     const { name } = req.params;
     const { timerName, timecode } = req.body;
-    controller.updateClipTimersByName(name, timerName, timecode);
+    controller.updateClipTimersByClipName(name, timerName, timecode);
     res.status(200).send('Clip timer updated');
 };
 
