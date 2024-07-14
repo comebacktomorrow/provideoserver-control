@@ -7,26 +7,67 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>ProVideoServer Controller</h1>
-    <button id="playButton" class="button play" onclick="play()">&#9658;</button>  <!-- Play symbol -->
-<button id="pauseButton" class="button pause" onclick="pause()">&#10074;&#10074;</button>  <!-- Pause symbol -->
-<button id="stopButton" class="button stop" onclick="stop()">&#9632;</button>  <!-- Stop symbol -->
-    <button id="toggleButton" class="button toggle" onclick="toggle()">Toggle</button>
-    <button onclick="queueNext()">&#9654;&#9654;</button>
-    <button onclick="queuePrevious()">&#9664;&#9664;</button>
-    <button onclick="requeue()">&#8635;</button>
+    <!--<h1>ProVideoServer Controller</h1>-->
+
     <div id="status">
-        <p>State: <span id="state">N/A</span></p>
-        <p>Timecode: <span id="timecode">00:00:00:00</span></p>
-        <p>Clip Name: <span id="clipName">N/A</span></p>
+        <!--<p>State: <span id="state">N/A</span></p>-->
+        <p><div id="clipName">N/A</div></p>
+        <span class="counter" id="current-duration">00:00:00:00</span>
     </div>
     <div id="timeline">
         <span class="counter" id="current-timecode">00:00:00:00</span>
         <input type="range" id="timecodeRange" value="0" min="0" max="100" onclick="handleRangeChange(this.value)">
-        <span class="counter" id="current-duration">00:00:00:00</span>
+        <span class="counter" id="current-duration-remain">00:00:00:00</span>
+    </div>
+    <div id="aux-timers">
+        <div id="t1-remain"><span>T1</span><div id="t1rtc">00:00:00:00</div></div>
+        <div id="t2-remain"><span>T2</span><div id="t2rtc">00:00:00:00</div></div>
+        <div id="alt-remain"><span>TRT</span><div id="alttc">00:00:00:00</div></div>
+   </div>
+    <div class="timelinecontrol">
+        <button id="playButton" class="button play" style="display: none;"  onclick="play()">&#9658;</button>  <!-- Play symbol -->
+        <button id="pauseButton" class="button pause" style="display: none;" onclick="pause()">&#10074; &#10074;</button>  <!-- Pause symbol -->
+        <button id="stopButton" class="button stop" style="display: none;" onclick="stop()">&#9632;</button>  <!-- Stop symbol -->
+        <button id="clip" class="button" onclick="requeue()">&#8635;</button>
+        <button id="toggleButton" class="button toggle" onclick="toggle()">Toggle</button>
+
+        <button id="clip" class="button" onclick="queuePrevious()">
+            <span class="icon">&#9664;&#9664;</span>
+            <span class="text">C5000</span>
+        </button>
+        
+        <button id="clip" class="button" onclick="queueNext()">
+            <span class="icon">&#9654;&#9654;</span>
+            <span class="text">CXYZ</span>
+        </button>
+    </div>
+   <!-- <div class="timelinecontrol jump">
+        <button onclick="jump(-30)" class="button" >-30</button>
+        <button onclick="jump(-10)" class="button" >-10</button>
+        <button onclick="jump(-1)" class="button" >-1</button>
+        <button onclick="jump(1)" class="button" >+1</button>
+        <button onclick="jump(10)" class="button" >+10</button>
+        <button onclick="jump(30)" class="button" >+30</button>
+        <button onclick="jumpEnd(10)" class="button" >E10</button>
+        <button onclick="jumpEnd(30)" class="button" >E30</button>
+        
+    </div>-->
+    <div class="timelinecontrol timers jump">
+        <button onclick="jumpToTimerTimecode('t1')" class="button jump" >Jump T1</button>
+        <button onclick="setActiveClipTimerByName('t1')" class="button set" >Set T1</button>
+        <button onclick="setActiveClipTimerByName('t1', true)" class="button clr" >Clear T1</button>
+        <button onclick="jumpToTimerTimecode('t2')" class="button jump" >Jump T2</button>
+        <button onclick="setActiveClipTimerByName('t2')" class="button set" >Set T2</button>
+        <button onclick="setActiveClipTimerByName('t2', true)" class="button clr" >Clear T2</button>
+        <button onclick="jumpToTimerTimecode('trt')" class="button jump" >Jump End</button>
+        <button onclick="setActiveClipTimerByName('trt')" class="button set" >Set End</button>
+        <button onclick="setActiveClipTimerByName('trt', true)" class="button clr" >Clear End</button>
     </div>
     <div id="response"></div>
     <div id="playlist"></div>
+    
+    <script src="smpte-timecode.js"></script>
     <script src="scripts.js"></script>
+    
 </body>
 </html>

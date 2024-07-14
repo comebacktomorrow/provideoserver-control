@@ -20,6 +20,21 @@ button:hover {
 #response, #status {
     margin-top: 20px;
 }
+
+#clipName {
+    font-size: 2.5em;
+    text-align: center;
+    color: #ffffff; /* Text color */
+    text-shadow: 0 0 5px #ffffff93; /* Glow effect */
+    text-wrap: balance;
+}
+
+#status #current-duration {
+    color: white;
+    display: block;
+    text-align: center;
+}
+
 #playlist {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -47,7 +62,7 @@ button:hover {
 #timeline .counter {
     width: fit-content;
     font-family: 'SpaceMonoBold';
-    font-size: 2em;
+    font-size: 1.6em;
     
 }
 
@@ -88,9 +103,42 @@ button:hover {
     cursor: pointer;
 }
 
+#aux-timers {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically if needed */
+    gap: 20px; /* Space between the two divs */
+    margin-top: -30px;
+}
+
+#t1-remain, #t2-remain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border: 1px solid #000; /* Add a border for visual separation, if needed */
+
+    
+    background-color: #303030;
+    color: #848484;
+    padding: 3px 6px;
+    margin: 2px;
+    border-radius: 5px;
+    width:fit-content;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+}
+
+#t1-remain span, #t2-remain span {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
 .playlist-item {
-    background-color: #393939;
-    border: 1px solid #ddd;
+    background-color: #242424;
+    border: 1px solid #616161;
     border-radius: 5px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -99,15 +147,29 @@ button:hover {
     align-items: flex-start; /* Align items at the start of the flex container */
     flex-wrap: wrap; /* Allow tags to wrap if necessary */
     color: white;
+    position: relative; 
 }
 .playlist-item.selected {
-    background-color: #7f6f51; /* Light green for selected items */
+    background-color: #585858; /* Light green for selected items */
 }
-.playlist-item h3 {
+
+
+.head h3 {
     margin: 0;
-    font-size: 1.2em;
-    height: 2.4em;
+    word-break: break-word; /* Ensures long words break appropriately */
+    padding-right: 50px; /* Adds space for the behaviour element */
+    height: 3em;
 }
+
+.playlist-item .behaviour {
+        position: absolute; /* Positions the element independently of the document flow */
+        top: 5px; /* Aligns to the top of the container */
+        right: 5px; /* Aligns to the right of the container */
+        padding: 5px; /* Optional: add some padding */
+        font-weight: bold;
+}
+    
+
 .playlist-item p {
     margin: 5px 0;
 }
@@ -116,10 +178,11 @@ button:hover {
     width: 100%;
 }
 
+
 .meta {
     display: inline-block;
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: #717171;
+    color: #2c2c2c;
     padding: 3px 6px;
     margin: 2px;
     border-radius: 5px;
@@ -166,19 +229,19 @@ button:hover {
 .button.active.play, .button.toggle.play {
     background-color: #00ce18;
     color: #ffffff;
-    border-color: #007bff;
+    border-color: #00ff3c;
 }
 
 .button.active.stop {
     background-color: #ff0000;
     color: #ffffff;
-    border-color: #007bff;
+    border-color: #ff4949;
 }
 
 .button.active.pause, .button.toggle.pause {
     background-color: #ff9500;
     color: #ffffff;
-    border-color: #007bff;
+    border-color: #ffbb00;
 }
 
 .button.play:hover,
@@ -198,4 +261,63 @@ button:hover {
 .button.stop:hover,
 .button.stop:focus {
     background-color: #910000;
+}
+
+.timelinecontrol {
+    padding-top: 10px;
+    display: flex;
+    width: 100%;
+}
+
+/* Flex item styles */
+.timelinecontrol .button {
+    flex: 1; /* Ensures all buttons have equal size */
+    margin: 10px 10px; /* Adds space between buttons on the left and right */
+    padding: 10px 0; /* Adjusts padding for better appearance */
+    font-size: 24px;  /* Increase font size for better visibility */
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    font-family: Arial, sans-serif; /* Use a non-emoji font */
+    text-align: center; /* Center the text within the buttons */
+    height: 3em
+}
+
+/* Remove margin from the first and last buttons to avoid overflow */
+.timelinecontrol .button:first-child {
+    margin-left: 0;
+}
+
+.timelinecontrol .button:last-child {
+    margin-right: 0;
+}
+
+.timelinecontrol.jump button {
+    background-color: black;
+}
+
+.timelinecontrol #clip {
+    background-color: grey;
+}
+
+.button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.button .icon {
+    font-size: 1.5rem;
+}
+
+.button .text {
+    font-size: 1rem;
+    color: #ffffff;
 }
