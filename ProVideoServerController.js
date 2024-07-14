@@ -21,6 +21,7 @@ class ProVideoServerController {
         this.previousTime = null; // Previous state for time
         this.transportState = 'STOPPED'; // Initialize transport state
         this.libraryTimestamp = 0;
+        this.tallyState = -1;
 
 
         //this.currentClipObj = [];
@@ -179,7 +180,7 @@ class ProVideoServerController {
             (frames === jumptc.frames )
         ) {
             this.transportState = 'AT_END';
-            if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null) {
+            if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null && this.tallyState != 1) {
                 this.setAutoCueTimer();
               }
         } else if (this.isPlaying(this.currentTimecode) && this.transportState != 'CUEING') {
@@ -192,7 +193,7 @@ class ProVideoServerController {
             // this is our soft stop function - if we're within 0.1% of the end, we'll treat it as a stop
             if  ((progress) >= 0.99){
                 this.transportState = 'AT_END';
-                if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null) {
+                if (this.AUTO_CUE_TIMER !== 0 && this.autoCueTimer === null && this.tallyState != 1) {
                     this.setAutoCueTimer();
                   }
             } else {
@@ -227,7 +228,7 @@ class ProVideoServerController {
     setAutoCueTimer() {
         logger.debug("CTRL: AUTOCUE - Timer has been set")
         this.autoCueTimer = setTimeout(() => {
-            if (this.transportState === 'AT_END' && !this.autoCueDisable) {
+            if (this.transportState === 'AT_END' && !this.autoCueDisable && this.tallyState != 1) { // I don't know that tallystate here does anything
                 logger.debug("CTRL: AUTOCUE - AutoCue time out - queueing next clip");
                 this.queueNext();
                 clearTimeout(this.autoCueTimer);
@@ -735,6 +736,10 @@ class ProVideoServerController {
             logger.verbose("new timestamp is " + newTime);
             updateLoadedClipPlaylistData(true);
         }
+    }
+    setTallyState(state){
+        console.log("setting tally state to " + state)
+        this.tallyState = state;
     }
 
 
