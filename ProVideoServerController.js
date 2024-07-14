@@ -681,18 +681,17 @@ class ProVideoServerController {
     }
 
     //set a clip as selected
-    setClipTimer(clipname, timer, timecode, callback) {
     setClipTimerByClipName(clipname, timer, timecode, callback) {
         logger.verbose("CTRL: Called set timer for clip", clipname);
-        return this.libraryParser.setClipTimer(clipname, timer.timecode, timecode, callback);
-        return this.libraryParser.setClipTimerByName(clipname, timer.timecode, timecode, callback);
+        return this.libraryParser.setClipTimerByClipName(clipname, timer.timecode, timecode, callback);
     }
 
     //set a clip as selected
     setClipTimerByClipIndex(index, timer, timecode, callback) {
         logger.verbose("CTRL: Called set timer for clip", index);
-        return this.libraryParser.setClipTimerByIndex(index, timer, timecode, callback);
+        return this.libraryParser.setClipTimerByClipIndex(index, timer, timecode, callback);
     }
+
     getLibraryTimestamp() {
         return this.libraryTimestamp;
     }
