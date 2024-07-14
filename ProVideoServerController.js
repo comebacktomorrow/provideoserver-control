@@ -232,6 +232,9 @@ class ProVideoServerController {
         return this.currentClip.plnName;
     }
 
+    getCurrentClocks(){
+        return this.clocks;
+    }
 
 
     getCurrentTransportTime() {
