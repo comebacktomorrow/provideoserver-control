@@ -75,7 +75,7 @@ body {
         max-width: 100%;
         margin: 0;
         margin-top: 20px; /* Space between playlist and playback control container */
-        overflow: scroll;
+        
     }
 
     #playback-control-container {
@@ -325,40 +325,7 @@ body {
     font-size: 1em;
   }
   
-  /* Media query for smaller screens */
-  @media (max-width: 400px) {
-    #container,#playlist{
-        max-height: none;
-        overflow: visible;
-        height: auto;
-    }
-
-    #playback-timers-container {
-      flex-direction: row;
-      flex-wrap: wrap;
-    }
-
-    #playback-lhs-container {
-        order: 1;
-    }
-
-    #playback-rhs-container {
-        order: 2;
-    }
   
-    #playback-buttons-container {
-      flex: none;
-      width: 100%;
-      justify-content: space-between;
-      order: 3;
-      flex: 1;
-    }
-  
-    #playback-buttons-container .button {
-      width: 100%;
-      margin: 5px 0; /* Adjust margin for spacing between buttons */
-    }
-  }
 
 
 
@@ -399,11 +366,14 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1em;
-    border: 1px solid #333;
     border-radius: 5px;
-    background-color: #384B51;
+    background-color: #2b3337;
     height: auto;
     margin: 0px;
+  }
+
+ .selected {
+    background-color: #465e65;
   }
   
   .playlist-content {
@@ -468,11 +438,25 @@ body {
     cursor: pointer;
     font-size: 0.9em;
     transition: background-color 0.3s;
-    height: 100%
+    height: 100%;
+    min-width: 4em;
   }
   
   .button.playlist-go:hover {
     background-color: #0056b3;
+  }
+
+  @media (max-width: 900px) {
+    .playlist-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .button.playlist-go {
+        align-self: stretch;
+        text-align: center;
+        margin-top: 10px;
+      }
   }
   
   /* Media query for smaller screens */
@@ -488,5 +472,53 @@ body {
       margin-top: 10px;
     }
     
+    #playlist{
+        overflow:scroll;
+    }
+  }
+
+
+
+
+  /* Media query for smaller screens */
+  @media (max-width: 400px) {
+    #container,#playlist{
+        max-height: none;
+        overflow: visible;
+        height: auto;
+    }
     
+    #playlist{
+        overflow: visible;
+    }
+
+    #playback-timers-container {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    #playback-lhs-container {
+        order: 1;
+    }
+
+    #playback-rhs-container {
+        order: 2;
+    }
+  
+    #playback-buttons-container {
+      flex: none;
+      width: 100%;
+      justify-content: space-between;
+      order: 3;
+      flex: 1;
+    }
+  
+    #playback-buttons-container .button {
+      width: 100%;
+      margin: 5px 0; /* Adjust margin for spacing between buttons */
+    }
+
+    #playback-control-container {
+        max-height: none;
+    }
   }

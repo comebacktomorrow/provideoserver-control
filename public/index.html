@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProVideoServer Controller</title>
+    <link rel="stylesheet" href="styles2.css" />
+    <link rel="stylesheet" href="./css/timeline-styles.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="playback-control-container">
+        <div id="playback-container">
+          <div id="tally-wrapper"><div id="tally"></div></div>
+          <div id="playback-status">PLAYING</div>
+          <div id="playback-title">
+            A long title title that hopefully spans two liens of text and maybe
+            three lines
+          </div>
+          <div id="playback-bar-container">
+            <div id="playback-behaviour">STOP</div>
+            <div id="playback-bar">
+                <input type="range" id="customRange" min="0" max="100" value="50" step="1">
+                <div id="barGraph"></div>
+                <div id="ticks"></div>
+            </div>
+          </div>
+          <div id="playback-timers-container">
+            <div id="playback-lhs-container">
+              <div id="playback-count" class="primary">00:00:00:00</div>
+              <div id="playback-duration" class="secondary">00:00:00:00</div>
+            </div>
+            <div id="playback-buttons-container">
+              <button id="playback-timer-1" class="button">
+                T1 00:00:00:00
+              </button>
+              <button id="playback-timer-2" class="button">
+                T2 00:00:00:00
+              </button>
+            </div>
+            <div id="playback-rhs-container">
+              <div id="playback-remaining1" class="primary">00:00:00:00</div>
+              <div id="playback-remaining2" class="secondary">
+                TRT 00:00:00:00
+              </div>
+            </div>
+          </div>
+          <div id="playback-transport-control">
+            <button id="clip" class="button">&#8635;</button>
+            <button id="toggleButton" class="button toggle">Toggle</button>
+
+            <button id="clip" class="button">
+              <span class="icon">&#9664;&#9664;</span>
+              <span class="text">PREV</span>
+            </button>
+            <button id="clip" class="button">
+              <span class="icon">&#9654;&#9654;</span>
+              <span class="text">NEXT</span>
+            </button>
+          </div>
+          <div id="timers-controls">
+            <div id="timers-name">T1</div>
+            <button id="timers-set" class="button">Set</button>
+            <button id="timers-goto" class="button">Go To</button>
+            <button id="timers-clear" class="button">Clear</button>
+            <button id="timers-close" class="button">X</button>
+          </div>
+          <div id="timers-controls" style="display: none">
+            <div id="timers-name">T2</div>
+            <button id="timers-set" class="button">Set</button>
+            <button id="timers-goto" class="button">Go To</button>
+            <button id="timers-clear" class="button">Clear</button>
+            <button id="timers-close" class="button">X</button>
+          </div>
+          <div id="timers-controls" style="display: none">
+            <div id="timers-name">TRT</div>
+            <button id="timers-set" class="button">Set</button>
+            <button id="timers-goto" class="button">Go To</button>
+            <button id="timers-clear" class="button">Clear</button>
+            <button id="timers-close" class="button">X</button>
+          </div>
+        </div>
+      </div>
+      <div id="playlist">
+        <div id="playlist-item-0" class="playlist-item selected">
+            <div class="playlist-content">
+                <h3 class="playlist-item-title">A long title</h3>
+                <div class="playlist-item-data-container">
+                    <div class="playlist-item-duration">00:00:00:00</div>
+                    <div class="playlist-item-behaviour">LOOP</div>
+                    <div class="playlist-item-meta">1920x1080 @ 59.97fps H264</div>
+                </div>
+                <div class="playlist-item-timers-container">
+                    <div class="playlist-item-trt">TRT 00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T1</span>00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T2</span>00:00:00:00</div>
+                </div>
+            </div>
+            <button class="button playlist-go">Load</button>
+        </div>
+        <div id="playlist-item-0" class="playlist-item">
+            <div class="playlist-content">
+                <h3 class="playlist-item-title">A long title</h3>
+                <div class="playlist-item-data-container">
+                    <div class="playlist-item-duration">00:00:00:00</div>
+                    <div class="playlist-item-behaviour">LOOP</div>
+                    <div class="playlist-item-meta">1920x1080@50fps H264</div>
+                </div>
+                <div class="playlist-item-timers-container">
+                    <div class="playlist-item-trt">TRT 00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T1</span>00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T2</span>00:00:00:00</div>
+                </div>
+            </div>
+            <button class="button playlist-go">Load</button>
+        </div>
+        <div id="playlist-item-0" class="playlist-item">
+            <div class="playlist-content">
+                <h3 class="playlist-item-title">A long title</h3>
+                <div class="playlist-item-data-container">
+                    <div class="playlist-item-duration">00:00:00:00</div>
+                    <div class="playlist-item-behaviour">LOOP</div>
+                    <div class="playlist-item-meta">1920x1080@50fps H264</div>
+                </div>
+                <div class="playlist-item-timers-container">
+                    <div class="playlist-item-trt">TRT 00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T1</span>00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T2</span>00:00:00:00</div>
+                </div>
+            </div>
+            <button class="button playlist-go">Load</button>
+        </div>
+        <div id="playlist-item-0" class="playlist-item">
+            <div class="playlist-content">
+                <h3 class="playlist-item-title">A long title</h3>
+                <div class="playlist-item-data-container">
+                    <div class="playlist-item-duration">00:00:00:00</div>
+                    <div class="playlist-item-behaviour">LOOP</div>
+                    <div class="playlist-item-meta">1920x1080@50fps H264</div>
+                </div>
+                <div class="playlist-item-timers-container">
+                    <div class="playlist-item-trt">TRT 00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T1</span>00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T2</span>00:00:00:00</div>
+                </div>
+            </div>
+            <button class="button playlist-go">Load</button>
+        </div>
+        <div id="playlist-item-0" class="playlist-item">
+            <div class="playlist-content">
+                <h3 class="playlist-item-title">A long title</h3>
+                <div class="playlist-item-data-container">
+                    <div class="playlist-item-duration">00:00:00:00</div>
+                    <div class="playlist-item-behaviour">LOOP</div>
+                    <div class="playlist-item-meta">1920x1080@50fps H264</div>
+                </div>
+                <div class="playlist-item-timers-container">
+                    <div class="playlist-item-trt">TRT 00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T1</span>00:00:00:00</div>
+                    <div class="playlist-item-timer"><span>T2</span>00:00:00:00</div>
+                </div>
+            </div>
+            <button class="button playlist-go">Load</button>
+        </div>
+        <div id="playlist-item-2" class="playlist-item"></div>
+      </div>
+    </div>
+    <script src="./scripts/timeline.js"></script>
+  </body>
+</html>
