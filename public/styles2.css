@@ -1,0 +1,492 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+   
+    
+}
+
+body {
+    background-color: #1D1E23; /* Background color for the body */
+    font-family: Arial, sans-serif; /* Default font */
+}
+
+#container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: space-between;
+    max-width: 1200px; /* Maximum width for widescreen displays */
+    width: 100%;
+    padding: 5px;
+    max-height: 640px;
+    margin: 1em;
+    background-color: #1D1E23; /* Background color for the container */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
+    border-radius: 10px; /* Optional rounded corners */
+    height: 100%;
+    
+}
+
+/* Playlist container should take up 1/3 of the container and be on the left */
+#playlist {
+    order: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #2A2C33; /* Example background color for playlist */
+    border-radius: 10px;
+    margin-right: 10px; /* Space between playlist and playback control container */
+    max-height: 640px;
+    height: 100%;
+}
+
+/* Playback control container should take up 2/3 of the container and be on the right */
+#playback-control-container {
+    order: 2;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    background-color: #2A2C33; /* Example background color for playback control container */
+    border-radius: 10px;
+    padding: 10px;
+
+
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #playlist {
+        order: 2;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        margin-top: 20px; /* Space between playlist and playback control container */
+        overflow: scroll;
+    }
+
+    #playback-control-container {
+        order: 1;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        max-height: 500px;
+    }
+
+    #container,#playlist{
+        max-height: 100%;
+        height: 100%;
+    }
+}
+
+/* Additional styles for inner elements */
+#playback-container {
+    width: 100%;
+    background-color: none; /* Example background color for the playback container */
+    margin-bottom: 20px; /* Space between elements */
+    padding: 10px;
+    border-radius: 3px;
+}
+
+#playback-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px; /* Space between elements */
+    font-size: 1.2em;
+    color: white;
+    padding: 1em;
+    height: 5em;
+}
+
+#playback-status {
+    width: 100%;
+    text-align: center;
+    font-size: 0.8em;
+    color: rgb(130, 130, 130);
+    
+}
+
+#playback-bar {
+    height: 4em; /* Example height for the playback bar */
+    margin-bottom: 0px; /* Space between elements */
+    border-radius: 5px;
+    display: flex;
+    position: relative;
+}
+
+#playback-behaviour{
+    background-color: rgb(111, 111, 111);
+    display: block;
+    width: 5em;
+    margin-left: auto; /* Pushes this element to the right */
+    margin-bottom: 1em;
+    height: 1.2em;
+    text-align: center;
+    border-radius: 0.5em;
+    font-size: 0.8em;
+}
+
+#playback-timers-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px; /* Space between elements */
+}
+
+#playback-lhs-container, #playback-rhs-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#playback-count, #playback-duration, #playback-remaining1, #playback-remaining2 {
+    margin-bottom: 10px; /* Space between elements */
+}
+
+.button {
+    flex-grow: 1; /* Allow buttons to grow and fill available space */
+    margin: 0 5px; /* Add space between buttons */
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    background-color: #384B51; /* Default button background color */
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button.toggle {
+    background-color: #28A745; /* Different background color for the toggle button */
+}
+
+.button .icon {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+.button .text {
+    display: block;
+}
+
+#timers-controls {
+    display: flex;
+    justify-content: space-around;
+}
+
+#timers-name {
+    margin-right: 10px; /* Space between elements */
+}
+
+.playlist-item {
+    width: 100%;
+    height: 50px; /* Example height for playlist items */
+    background-color: #b0b0b0; /* Example background color for playlist items */
+    margin-bottom: 10px; /* Space between elements */
+    border-radius: 5px;
+}
+
+#tallywrapper {
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Horizontal center */
+    align-items: center; /* Vertical center */
+    width: 100%
+}
+
+
+#playback-transport-control, #timers-control {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5em;/* Adjust the gap between buttons as needed */
+}
+
+#playback-transport-control .button {
+    flex: 1; /* Make each button take equal space */
+    text-align: center; /* Center text inside the button */
+    margin: 0px 0px 10px 0px;
+    height: 5em;
+   
+}
+
+#timers-controls {
+    background-color: #2F3C3F;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+#timers-controls .button {
+    margin: 0px 5px 0px 0px;
+    background-color: #384B51;
+}
+
+#timers-close{
+    background-color: #2F3C3F !important;
+    width:0.2em;
+    padding: 0px;
+
+}
+
+#timers-name {
+    flex: 1; /* Make the timers name take up the same space as the buttons */
+    text-align: center; /* Center the timer name text */
+    flex-grow: 1; /* Allow buttons to grow and fill available space */
+    margin: 0px 5px 5px 0px; /* Add space between buttons */
+    padding: 10px;
+    border: none;
+    border-radius: 3px;
+    
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+#tally {
+    display: flex;
+    justify-content: center; /* Horizontal center for content inside the div */
+    align-items: center; /* Vertical center for content inside the div */
+    margin: 1em 25% 1em 25%;
+    height: 1em;
+    background-color: rgb(38, 38, 38);
+    border-radius: 1em;
+    box-shadow: rgba(0, 0, 0, 0.0) 0 0 5px 5px;
+    transition: background-color 0.5s, box-shadow 0.5s; /* Add transitions */
+}
+
+#tally.program {
+    background-color: red !important;
+    box-shadow: rgba(255, 0, 0, 0.2) 0 0 5px 5px !important;
+}
+
+#tally.preview {
+    background-color: #00ff3c !important;
+    box-shadow: rgba(98, 255, 0, 0.2) 0 0 5px 5px !important;
+}
+
+
+
+
+#playback-timers-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 10px; /* Adjust the gap as needed */
+    color: white;
+  }
+  
+  #playback-lhs-container, #playback-rhs-container {
+    flex: 4; /* 60% of the space, shared between lhs and rhs */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+  }
+
+
+
+  
+  #playback-buttons-container {
+    flex: 8; /* 40% of the space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Adjust the gap as needed */
+  }
+  
+  #playback-buttons-container .button {
+    flex: 1;
+    text-align: center;
+    background-color: #2A2C33 !important;
+    border: #384B51 1px solid;
+  }
+  
+  .primary {
+    font-size: 1.5em; /* Larger text for primary elements */
+    font-weight: bold;
+  }
+  
+  .secondary {
+    font-size: 1em;
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 400px) {
+    #container,#playlist{
+        max-height: none;
+        overflow: visible;
+        height: auto;
+    }
+
+    #playback-timers-container {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    #playback-lhs-container {
+        order: 1;
+    }
+
+    #playback-rhs-container {
+        order: 2;
+    }
+  
+    #playback-buttons-container {
+      flex: none;
+      width: 100%;
+      justify-content: space-between;
+      order: 3;
+      flex: 1;
+    }
+  
+    #playback-buttons-container .button {
+      width: 100%;
+      margin: 5px 0; /* Adjust margin for spacing between buttons */
+    }
+  }
+
+
+
+
+
+  /* Basic styling for the range input */
+
+  
+  datalist {
+    display: flex;
+    justify-content: space-between;
+    color: red;
+   flex-grow: 1;
+  }
+
+  
+  
+
+
+
+
+
+
+
+
+
+  #playlist {
+    display: flex;
+    flex-direction: column;
+    gap: 1em; /* Spacing between playlist items */
+    width: 100%;
+    padding: 1em;
+    overflow: scroll;
+  }
+  
+  .playlist-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em;
+    border: 1px solid #333;
+    border-radius: 5px;
+    background-color: #384B51;
+    height: auto;
+    margin: 0px;
+  }
+  
+  .playlist-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
+  }
+  
+  .playlist-item-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  .playlist-item-data-container,
+  .playlist-item-timers-container {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .playlist-item-data-container > div,
+  .playlist-item-timers-container > div {
+    color: #ccc;
+    padding: 1px;
+    font-size: 0.6em;
+  }
+
+  .playlist-item-duration{
+    font-size: 1em !important;
+    font-weight: bold;
+  }
+
+  .playlist-item-trt{
+    /* padding: 0px 0px 3px 3px; */
+    margin-top: 3px;
+    font-weight: bold;
+  }
+
+  .playlist-item-timer{
+    background-color: #2A2C33;
+    padding: 3px !important;
+    color: #465e65 !important;
+    padding-bottom: 2px !important;
+    border-radius: 2px;
+  }
+
+  .playlist-item-timer > span{
+    
+    padding: 0px 2px 0px 0px;
+    margin: 1px;
+   
+    color: white !important;
+  }
+  
+  .button.playlist-go {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+    height: 100%
+  }
+  
+  .button.playlist-go:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 768px) {
+    .playlist-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .button.playlist-go {
+      align-self: stretch;
+      text-align: center;
+      margin-top: 10px;
+    }
+    
+    
+  }
