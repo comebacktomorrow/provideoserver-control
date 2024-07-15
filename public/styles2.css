@@ -16,7 +16,7 @@ html, body {
 
 body {
     background-color: #1D1E23; /* Background color for the body */
-    font-family: Arial, sans-serif; /* Default font */
+    font-family: Helvetica, Arial, sans-serif, sans-serif; /* Default font */
 }
 
 #container {
@@ -105,7 +105,7 @@ body {
     width: 100%;
     text-align: center;
     margin-bottom: 10px; /* Space between elements */
-    font-size: 1.2em;
+    font-size: 1.6em;
     color: white;
     padding: 1em;
     height: 5em;
@@ -152,7 +152,7 @@ body {
 }
 
 #playback-count, #playback-duration, #playback-remaining1, #playback-remaining2 {
-    margin-bottom: 10px; /* Space between elements */
+    margin-bottom: 0px; /* Space between elements */
 }
 
 .button {
@@ -239,6 +239,19 @@ body {
 
 }
 
+#timers-close:hover {
+    background-color: #426e753c !important;
+}
+
+#playback-remaining2 {
+    border-bottom: #384B51 1px solid;
+}
+
+#playback-remaining2:hover {
+    background-color: #426e753c !important;
+    cursor:pointer;
+}
+
 #timers-name {
     flex: 1; /* Make the timers name take up the same space as the buttons */
     text-align: center; /* Center the timer name text */
@@ -249,7 +262,6 @@ body {
     border-radius: 3px;
     
     color: white;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -315,6 +327,8 @@ body {
     background-color: #2A2C33 !important;
     border: #384B51 1px solid;
   }
+
+
   
   .primary {
     font-size: 1.5em; /* Larger text for primary elements */
@@ -430,9 +444,8 @@ body {
   }
   
   .button.playlist-go {
-    background-color: #007bff;
+    background-color: transparent;
     color: #fff;
-    border: none;
     padding: 10px 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -440,10 +453,19 @@ body {
     transition: background-color 0.3s;
     height: 100%;
     min-width: 4em;
+    border: rgba(255, 255, 255, 0.19) 1px solid
+  }
+
+   .button:hover {
+    background-color: #426e75 !important;
   }
   
   .button.playlist-go:hover {
-    background-color: #0056b3;
+    background-color: #426e75;
+  }
+
+  #playback-buttons-container .button:hover {
+    background-color: #426e75 !important;
   }
 
   @media (max-width: 900px) {
@@ -504,6 +526,11 @@ body {
     #playback-rhs-container {
         order: 2;
     }
+
+    #playback-title {
+        font-size: 1.1em;
+        text-wrap:balance;
+    }
   
     #playback-buttons-container {
       flex: none;
@@ -522,3 +549,4 @@ body {
         max-height: none;
     }
   }
+
