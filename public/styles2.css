@@ -83,7 +83,7 @@ body {
         width: 100%;
         max-width: 100%;
         margin: 0;
-        max-height: 500px;
+        max-height: 515px;
     }
 
     #container,#playlist{
@@ -109,6 +109,10 @@ body {
     color: white;
     padding: 1em;
     height: 5em;
+}
+
+#playback-title {
+  font-size: calc(1.5em + 1vw)
 }
 
 #playback-status {
@@ -146,6 +150,10 @@ body {
     margin-bottom: 20px; /* Space between elements */
 }
 
+#playback-timers-container > * {
+  font-variant-numeric: tabular-nums;
+}
+
 #playback-lhs-container, #playback-rhs-container {
     display: flex;
     flex-direction: column;
@@ -181,7 +189,9 @@ body {
     display: block;
 }
 
-#timers-controls {
+
+
+.timers-controls {
     display: flex;
     justify-content: space-around;
 }
@@ -221,13 +231,40 @@ body {
    
 }
 
-#timers-controls {
+.timers-controls {
     background-color: #2F3C3F;
     padding: 5px;
     border-radius: 5px;
 }
 
-#timers-controls .button {
+.timers-controls-clear {
+  cursor: pointer;
+  opacity: 30%;
+  justify-content: space-around;
+  box-sizing: border-box;
+  display: flex;
+  margin-bottom: -10px;;
+  color: white;
+  padding: 5px;
+
+}
+
+#timers-jump {
+  cursor: pointer;
+  color: #1D1E23;
+  justify-content: space-around;
+  box-sizing: border-box;
+  text-align: center;
+  background-color: none;
+  padding: 5px;
+  
+}
+
+.timers-control-clear #timers-name {
+  margin: 0px !important;
+}
+
+.timers-controls .button {
     margin: 0px 5px 0px 0px;
     background-color: #384B51;
 }
@@ -457,7 +494,7 @@ body {
   }
 
    .button:hover {
-    background-color: #426e75 !important;
+    background-color: #426e75;
   }
   
   .button.playlist-go:hover {
@@ -479,6 +516,8 @@ body {
         text-align: center;
         margin-top: 10px;
       }
+
+
   }
   
   /* Media query for smaller screens */
@@ -497,13 +536,17 @@ body {
     #playlist{
         overflow:scroll;
     }
+
+    #playback-title{
+      font-size: 1.6em;
+    }
   }
 
 
 
 
   /* Media query for smaller screens */
-  @media (max-width: 400px) {
+  @media (max-width: 520px) {
     #container,#playlist{
         max-height: none;
         overflow: visible;
@@ -512,6 +555,10 @@ body {
     
     #playlist{
         overflow: visible;
+    }
+
+    #playback-container {
+      margin-bottom: 0px;
     }
 
     #playback-timers-container {
@@ -548,5 +595,25 @@ body {
     #playback-control-container {
         max-height: none;
     }
+
+    .odd {
+      display: none;
+    }
   }
 
+
+.play {
+    background-color: green;;
+  }
+
+  .play:hover {
+    background-color: rgb(58, 203, 58);;
+  }
+  
+ .pause {
+    background-color: rgb(255, 157, 0) !important;;
+  }
+
+  .pause:hover {
+    background-color: rgb(249, 179, 67) !important;;
+  }

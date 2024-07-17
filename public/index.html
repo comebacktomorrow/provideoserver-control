@@ -20,7 +20,7 @@
           <div id="playback-bar-container">
             <div id="playback-behaviour">STOP</div>
             <div id="playback-bar">
-                <input type="range" id="customRange" min="0" max="100" value="50" step="1">
+                <input type="range" id="timeline" min="0" max="1000" value="50" step="1">
                 <div id="barGraph"></div>
                 <div id="ticks"></div>
             </div>
@@ -31,53 +31,74 @@
               <div id="playback-duration" class="secondary">00:00:00:00</div>
             </div>
             <div id="playback-buttons-container">
-              <button id="playback-timer-1" class="button">
+              <button id="playback-timer-1" class="button" onclick="toggleTimersControl(1)">
                 T1 00:00:00:00
               </button>
-              <button id="playback-timer-2" class="button">
+              <button id="playback-timer-2" class="button" onclick="toggleTimersControl(2)">
                 T2 00:00:00:00
               </button>
             </div>
             <div id="playback-rhs-container">
               <div id="playback-remaining1" class="primary">00:00:00:00</div>
-              <div id="playback-remaining2" class="secondary">
+              <div id="playback-remaining2" class="secondary" onclick="toggleTimersControl(3)">
                 TRT 00:00:00:00
               </div>
             </div>
           </div>
           <div id="playback-transport-control">
-            <button id="clip" class="button">&#8635;</button>
+            <button id="requeueButton" class="button">&#8635;</button>
             <button id="toggleButton" class="button toggle">Toggle</button>
 
-            <button id="clip" class="button">
+            <button id="queuePrevButton" class="button">
               <span class="icon">&#9664;&#9664;</span>
               <span class="text">PREV</span>
             </button>
-            <button id="clip" class="button">
+            <button id="queueNextButton" class="button">
               <span class="icon">&#9654;&#9654;</span>
               <span class="text">NEXT</span>
             </button>
           </div>
-          <div id="timers-controls">
+          <div class="timers-controls" id="timers-control-1"  style="display: none">
             <div id="timers-name">T1</div>
-            <button id="timers-set" class="button">Set</button>
-            <button id="timers-goto" class="button">Go To</button>
-            <button id="timers-clear" class="button">Clear</button>
-            <button id="timers-close" class="button">X</button>
+            <button id="timers-set" class="button" onclick="window.setActiveClipTimerByName('t1')">Set</button>
+            <button id="timers-goto" class="button" onclick="window.jumpToTimerTimecode('t1')">Go To</button>
+            <button id="timers-clear" class="button" onclick="window.setActiveClipTimerByName('t1', true)">Clear</button>
+            <button id="timers-close" class="button" onclick="toggleTimersControl(5)">X</button>
           </div>
-          <div id="timers-controls" style="display: none">
+          <div class="timers-controls" id="timers-control-2" style="display: none">
             <div id="timers-name">T2</div>
-            <button id="timers-set" class="button">Set</button>
-            <button id="timers-goto" class="button">Go To</button>
-            <button id="timers-clear" class="button">Clear</button>
-            <button id="timers-close" class="button">X</button>
+            <button id="timers-set" class="button" onclick="setActiveClipTimerByName('t2')">Set</button>
+            <button id="timers-goto" class="button" onclick="jumpToTimerTimecode('t2')">Go To</button>
+            <button id="timers-clear" class="button" onclick="setActiveClipTimerByName('t2', true)">Clear</button>
+            <button id="timers-close" class="button" onclick="toggleTimersControl(5)">X</button>
           </div>
-          <div id="timers-controls" style="display: none">
+          <div class="timers-controls" id="timers-control-3" style="display: none">
             <div id="timers-name">TRT</div>
-            <button id="timers-set" class="button">Set</button>
-            <button id="timers-goto" class="button">Go To</button>
-            <button id="timers-clear" class="button">Clear</button>
-            <button id="timers-close" class="button">X</button>
+            <button id="timers-set" class="button" onclick="setActiveClipTimerByName('trt')">Set</button>
+            <button id="timers-goto" class="button" onclick="jumpToTimerTimecode('trt')">Go To</button>
+            <button id="timers-clear" class="button" onclick="setActiveClipTimerByName('trt', true)">Clear</button>
+            <button id="timers-close" class="button" onclick="toggleTimersControl(5)">X</button>
+          </div>
+          <div class="timers-controls" id="timers-control-4" style="display: none">
+            <button id="timers-jumpb30" class="button" onclick="jumpTime(-30)">-30</button>
+            <button id="timers-jumpb10" class="button" onclick="jumpTime(-10)">-10</button>
+            <button id="timers-jumpb1" class="button odd" onclick="jumpTime(-1)">-1</button>
+            <button id="timers-jumpf1" class="button odd" onclick="jumpTime(1)">+1</button>
+            <button id="timers-jumpf10" class="button" onclick="jumpTime(10)">+10</button>
+            <button id="timers-jumpf30" class="button" onclick="jumpTime(30)">+30</button>
+            <button id="timers-jumpe30" class="button" onclick="jumpEnd(20)">E20</button>
+            <button id="timers-close" class="button" onclick="toggleTimersControl(5)">X</button>
+          </div>
+          <div class="timers-controls-clear" id="timers-control-5">
+            <button id="timers-jump" onclick="toggleTimersControl(4)">TIME</button>
+          </div>
+
+          <div class="timers-controls set-timers" id="timers-control-6" style="display: none">
+            <div id="timers-name">Set</div>
+            <button id="timers-set1" class="button" onclick="window.setActiveClipTimerByName('t1')">T1</button>
+            <button id="timers-set2" class="button" onclick="window.setActiveClipTimerByName('t2')">T2</button>
+            <button id="timers-set3" class="button" onclick="window.setActiveClipTimerByName('trt')">TRT</button>
+            <button id="timers-close" class="button" onclick="toggleTimersControl(5)">X</button>
           </div>
         </div>
       </div>
@@ -165,6 +186,18 @@
         <div id="playlist-item-2" class="playlist-item"></div>
       </div>
     </div>
-    <script src="./scripts/timeline.js"></script>
+    <script type ="module" src="./scripts/timeline.js"></script>
+    <script src="smpte-timecode.js"></script>
+    <script type="module">
+      import { jumpToTimerTimecode, setActiveClipTimerByName, toggleTimersControl, jumpTime, jumpEnd } from './scripts/uiUpdates.js';
+
+      // Attach the functions to the global window object
+      window.jumpToTimerTimecode = jumpToTimerTimecode;
+      window.setActiveClipTimerByName = setActiveClipTimerByName;
+      window.toggleTimersControl = toggleTimersControl;
+      window.jumpTime = jumpTime;
+      window.jumpEnd = jumpEnd;
+  </script>
+    <script type="module" src="./scripts/main.js"></script>
   </body>
 </html>
