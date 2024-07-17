@@ -468,7 +468,8 @@ class ProVideoServerController {
     }
 
     jumpBack(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
-                let endtime = this.currentClip.duration;
+                //let endtime = this.currentClip.duration;
+                let endtime = this.currentClip.trt;
                 let tc = operateTimecodes(jumptime.timecode, endtime, 'subtract' )
                 let ts = this.transportState;
                 this.cueUpData({timecode: tc})
