@@ -107,7 +107,7 @@ class ProVideoServerController {
                 await this.updateCurrentTimecode();
                 this.updateTransportState();
                 this.setLibraryTimestamp();
-                logger.info("CTRL: " + this.getLoadedNameClip() +  " is " + this.transportState + ". At " + JSON.stringify(this.getCurrentTransportTime().hours) +"h:"+ JSON.stringify(this.getCurrentTransportTime().minutes) +"m:"+  JSON.stringify(this.getCurrentTransportTime().seconds) +"s:"+ JSON.stringify(this.getCurrentTransportTime().frames) +"f");
+                //logger.info("CTRL: " + this.getLoadedNameClip() +  " is " + this.transportState + ". At " + JSON.stringify(this.getCurrentTransportTime().hours) +"h:"+ JSON.stringify(this.getCurrentTransportTime().minutes) +"m:"+  JSON.stringify(this.getCurrentTransportTime().seconds) +"s:"+ JSON.stringify(this.getCurrentTransportTime().frames) +"f");
                 
 
                 
@@ -122,7 +122,7 @@ class ProVideoServerController {
                 let t1_string = "T1: " + JSON.stringify(t1.hours) +"h:"+ JSON.stringify(t1.minutes) +"m:"+  JSON.stringify(t1.seconds) +"s:"+ JSON.stringify(t1.frames) +"f ";
                 let t2_string = "T2: " + JSON.stringify(t2.hours) +"h:"+ JSON.stringify(t2.minutes) +"m:"+  JSON.stringify(t2.seconds) +"s:"+ JSON.stringify(t2.frames) +"f ";
                 let trt_string = "TRT: " + JSON.stringify(trt.hours) +"h:"+ JSON.stringify(trt.minutes) +"m:"+  JSON.stringify(trt.seconds) +"s:"+ JSON.stringify(trt.frames) +"f ";
-                logger.info(tD_string + ' ' + t1_string + ' ' + t2_string + ' ' + trt_string);
+                //logger.info(tD_string + ' ' + t1_string + ' ' + t2_string + ' ' + trt_string);
 
             } catch (error) {
                 logger.warn('Error during polling:', error);
@@ -203,6 +203,7 @@ class ProVideoServerController {
 
             
         }
+
         //logger.debug("CTRL: " + this.getLoadedNameClip() +  " is " + this.transportState + ". At " + JSON.stringify(this.getCurrentTransportTime().hours) +"h:"+ JSON.stringify(this.getCurrentTransportTime().minutes) +"m:"+  JSON.stringify(this.getCurrentTransportTime().seconds) +"s:"+ JSON.stringify(this.getCurrentTransportTime().frames) +"f");
     }
 
@@ -739,7 +740,7 @@ class ProVideoServerController {
         }
     }
     setTallyState(state){
-        console.log("setting tally state to " + state)
+        //console.log("setting tally state to " + state)
         this.tallyState = state;
     }
 
