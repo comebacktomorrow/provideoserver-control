@@ -1,0 +1,18 @@
+{ "CONTROL": {
+    "PORT": 5050
+  },
+  "PVS": {
+    "IP_ADDRESS": "127.0.0.1",
+    "PORT": 3811,
+    "CHANNEL_NUMBER": 1,
+    "CHANNEL_NAME": "Vtr1"
+  },
+  "PRO_PRESENTER": {
+    "IP_ADDRESS": "localhost",
+    "PORT": 50050
+  },
+  "TSL_RX": {
+    "PORT": 40041,
+    "ADDRESS": 2
+  }
+}

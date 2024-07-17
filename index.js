@@ -1,4 +1,6 @@
 //index.js
+const fs = require('fs');
+const path = require('path');
 const ProVideoServerController = require('./ProVideoServerController');
 const startInteractiveConsole = require('./Interactive/interactive');
 const startWebServer = require('./REST/server');
@@ -7,26 +9,58 @@ const { umd } = require('./TSL-UMD/tsl-umd');
 //const { sendUMDMessage } = require('./TSL-UMD/tsl-umd-send'); 
 const goUMD = require('./TSL-UMD/tsl-umd');
 
-const PVS_IP_ADDRESS = '127.0.0.1'; // Replace with the actual IP address
-const PVS_PORT = 3811; // Replace with the actual port
-const PVS_CHANNEL_NUMBER = 1;
-const PVS_CHANNEL_NAME = 'Vtr1';
+const getConfigFilePath = () => {
+    const homeDirectory = process.env.HOME || process.env.USERPROFILE;
+    const documentsPath = path.join(homeDirectory, 'Documents', 'PVSControl.json');
+    const localPath = path.resolve(__dirname, 'PVSControl.json');
+    
+    if (fs.existsSync(documentsPath)) {
+        return documentsPath;
+    } else if (fs.existsSync(localPath)) {
+        return localPath;
+    } else {
+        throw new Error('PVSControl.json not found in either Documents folder or local directory.');
+    }
+};
 
-const PRO_PRESENTER_IP = 'localhost'; // Replace with the actual IP address
-const PRO_PRESENTER_PORT = 50050; // Replace with the actual port
+const configPath = getConfigFilePath();
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
-const TSL_PORT = 40041; //That we're listening on
-const TSL_ADDRESS = 2; //That we're listening for
+const {
+    CONTROL: {
+        PORT: WEB_PORT
+        },
+    PVS: {
+        IP_ADDRESS: PVS_IP_ADDRESS,
+        PORT: PVS_PORT,
+        CHANNEL_NUMBER: PVS_CHANNEL_NUMBER,
+        CHANNEL_NAME: PVS_CHANNEL_NAME
+    },
+    PRO_PRESENTER: {
+        IP_ADDRESS: PRO_PRESENTER_IP,
+        PORT: PRO_PRESENTER_PORT
+    },
+    TSL_RX: {
+        PORT: TSL_PORT,
+        ADDRESS: TSL_ADDRESS
+    }
+} = config;
+
+
+
 const controller = new ProVideoServerController(PVS_IP_ADDRESS, PVS_PORT, PVS_CHANNEL_NUMBER, PVS_CHANNEL_NAME);
 
-goUMD(controller);
+goUMD(controller, TSL_PORT, TSL_ADDRESS);
 
 // Start the interactive console
 startInteractiveConsole(controller);
 
 // Start the web server
-startWebServer(controller);
+startWebServer(controller, WEB_PORT);
 
-setInterval(() => {
-    updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
-}, 1000);
+//this is how we're updating the propresenter timers
+// setInterval(() => {
+//         updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
+//         sendUMDMessage(controller, '127.0.0.1', TSL_PORT, controller);
+// }, 1000);
+

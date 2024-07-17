@@ -10,7 +10,7 @@ const transportRoutes = require("./routes/transportRoutes");
 const transportTimeRoutes = require("./routes/transportTimeRoutes");
 const navigationRoutes = require("./routes/navigationRoutes");
 
-const startWebServer = (controller) => {
+const startWebServer = (controller, port) => {
     const app = express();
     const server = http.createServer(app);
     const io = socketIo(server, {
@@ -35,10 +35,10 @@ const startWebServer = (controller) => {
 
   initializeWebSocket(server, controller);
 
-  const PORT = process.env.PORT || 5050;
+  const PORT = process.env.PORT || port;
 
   server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${port}`);
   });
 };
 
