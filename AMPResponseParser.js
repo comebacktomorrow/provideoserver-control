@@ -31,7 +31,7 @@ class AMPResponseParser {
                 }
                 break;
             case '7404':
-                logger.verbose('Response Parser: 74.04 Handle timecode', response.data);
+                logger.verbose('Response Parser: 74.04 Handle timecode ' + response.data);
                 response.data = unpackRawTimecode(response.data); //we also need a unpack messy timecode as well
                 break;
             case '8216':

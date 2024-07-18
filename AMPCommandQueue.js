@@ -61,7 +61,7 @@ class AMPCommandQueue {
                 this.currentCommand.notifySuccess(response); // Assuming complex responses are successful
             }
         } else {
-            //console.error('----Queue - Invalid checksum in response:', response);
+            logger.error('----Queue - Invalid checksum in response:' + response)
             this.currentCommand.notifyFailure();
         }
 

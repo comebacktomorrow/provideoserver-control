@@ -64,29 +64,25 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
 
     // Handling timecode bug: frame rate gets seemingly multiplied by refresh rate * frame rate * min + frames
     // Adjust frames if a frame rate is provided
+    // Or it could just be multipled by seconds?
     if (frameRateOR) {
         //console.log('##############################FR override ' + frames);
         frames = Math.round((frames - (hours * 3600 + minutes * 60) * screenRefreshRate * frameRateOR));
     } else if (frames > 60 && !frameRateOR){
         for (const frameRate of possibleFrameRates) {
             let minFrameValue = (minutes * screenRefreshRate * frameRate);
-            if (hours > 0){ 
+            if (hours > 0 ){ 
                 minFrameValue = (((hours* 3600) + minutes * 60) * screenRefreshRate * frameRate);
             }
             const maxFrameValue = minFrameValue + frameRate - 1;
-
             //console.log("########################NO FR OR fr " + frameRate + " min " + minFrameValue + " max " + maxFrameValue);
-
             if (frames >= minFrameValue && frames <= maxFrameValue) {
                 const trueFrameValue = frames - minFrameValue;
-                logger.verbose({
-                    frameRate: frameRate,
-                    trueFrameValue: trueFrameValue
-                });
                 frames = Math.round(trueFrameValue);
             }
         }
     }
+    logger.verbose('decoded frame as ' + timecode + " frame set to " + frames)
 
     return { timecode: { frames, seconds, minutes, hours } };
 }
