@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProVideoServer Controller</title>
+    <link rel="stylesheet" href="styles2.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="playback-control-container">
+        <div id="playback-container">
+          <div id="playback-top-container">
+            <h4 id="playback-count" class="left">00:00:00:00</h4>
+            <h3 id="playback-status" class="mid">PLAYING</h3>
+            <h4 id="playback-duration" class="right">00:00:00:00</h4>
+          </div>
+          <h1 id="playback-title">A long title title that hopefully spans two lines of text</h1>
+          <div id="playback-mid-container">
+            <h2 id="playback-remaining1" class="primary">00:00:00:00</h2>
+            <div id="playback-behaviour">LOOP</div>
+            <h4 id="playback-remaining2">TRT 00:00:00:00</h4>
+          </div>
+          <div id="playback-bottom-container">
+            <h3 id="playback-timer-left" class="button">T1 00:00:00:00</h3>
+            <h3 id="playback-timer-right" class="button">T2 00:00:00:00</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="smpte-timecode.js"></script>
+    <script type="module" src="./scripts/main.js"></script>
+  </body>
+</html>
