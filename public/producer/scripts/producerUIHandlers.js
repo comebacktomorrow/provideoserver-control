@@ -1,5 +1,6 @@
 import { jsonTimecodeToString, timecodeToTotalFrames, calcTimeRemainingAsString } from './utils.js';
-import { fetchPlaylistData, updatePlaylistDOM, findClipByClipName, setSelectedClip } from './playlist.js';
+import { fetchPlaylistData, findClipByClipName } from './playlist.js';
+//import { updatePlaylistDOM, setSelectedClip } from './playlistDom.js';
 export let selectedClipData = {};
 
 export const updateTimer = (timerName, time, label = '') => {
@@ -34,7 +35,7 @@ export const updatePlaybackState = state => {
 
 export const createUIHandlers = (specificHandlers) => {
     const {
-        updatePlaylistDOM,
+        //updatePlaylistDOM,
         updateTransportButtonState,
         updatePlaybackState,
         updateTimelineData,
@@ -49,8 +50,8 @@ export const createUIHandlers = (specificHandlers) => {
             selectedClipData = findClipByClipName(socketData.clipName);
             if (selectedClipData) {
                 console.log('Playlist update recieved. Updating playlist.')
-                updatePlaylistDOM //we then refresh the dom // i don't know calling this works - it requires a playlist passed in
-                setSelectedClip(selectedClipData.index);
+                //updatePlaylistDOM //we then refresh the dom // i don't know calling this works - it requires a playlist passed in
+                //setSelectedClip(selectedClipData.index);
                 updateTimelineData;
             }
         });
@@ -67,12 +68,12 @@ export const createUIHandlers = (specificHandlers) => {
             selectedClipData = findClipByClipName(socketData.clipName);
             if (selectedClipData) {
                 //console.log('Playlist update recieved. Updating playlist.')
-                updatePlaylistDOM; //we then refresh the dom
+                //updatePlaylistDOM; //we then refresh the dom
                 document.getElementById('playback-title').innerText = socketData.clipName.replace(/\[[^\]]*\]/g, '').trim();  // we emulate the clean title for responseiveness 
                 document.getElementById('playback-duration').innerText = "/" + jsonTimecodeToString(selectedClipData.duration);
                 document.getElementById('playback-behaviour').innerText = selectedClipData.playbackBehavior;
                 updatePlaybackState(socketData.state);  
-                setSelectedClip(selectedClipData.index);
+                //setSelectedClip(selectedClipData.index);
                 updateTransportButtonState(socketData.state);
 
             }
