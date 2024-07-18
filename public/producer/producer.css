@@ -145,3 +145,6 @@ h3 {
 h4 {
   color: #707070;
 }
+#playback-duration, #playback-count, #playback-remaining1, #playback-remaining2, #playback-timer-left, #playback-timer-right {
+  font-family: "Avenir Next", Helvetica, Arial, sans-serif !important; /* Default font */
+}
