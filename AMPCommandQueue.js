@@ -38,12 +38,13 @@ class AMPCommandQueue {
 
         const response = AMPResponseParser.parse(responseString, this.currentCommand.getExpectedResponse());
 
+        const checksumDisable = this.currentCommand.getExpectedResponse().checksumDisable;
         if (!this.currentCommand) {
             logger.error('----Queue: handleResponse - No current command to handle response for');
             return;
         }
 
-        if (response.isValidChecksum || response.responseType === 'ACK') {
+        if (response.isValidChecksum || response.responseType === 'ACK' || checksumDisable) {
             logger.verbose('----Queue: handleResponse - Valid checksum or simple response in response:');
 
             if (response.responseType === 'ACK') {

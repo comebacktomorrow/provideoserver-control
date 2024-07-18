@@ -12,6 +12,7 @@ class AMPCommandProto {
         this.onFailureCallback = null;
         this.expectedResponse = 'ACK';
         this.expectedDataType = 'ack';
+        this.checksumDisable = false;
         this.skipCheckSum = skipchecksum;
 
         this.onSuccess(this.notifySuccess);
@@ -79,7 +80,8 @@ class AMPCommandProto {
     getExpectedResponse() {
         return {
             response:  this.expectedResponse,
-            type: this.expectedDataType
+            type: this.expectedDataType,
+            checksumDisable: this.checksumDisable !== undefined ? this.checksumDisable : false
         };
     }
 }

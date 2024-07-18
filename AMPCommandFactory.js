@@ -209,6 +209,7 @@ class CurrentTimeSenseCommand extends AMPCommandProto {
         
         this.expectedResponse = '7404';
         this.expectedDataType = 'pvptimecode';
+        this.checksumDisable = true;
     }
 
     pack() {
