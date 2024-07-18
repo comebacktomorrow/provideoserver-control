@@ -1,5 +1,5 @@
 import { setupWebSocket } from './websocket.js';
-import { createUIHandlers, updateTransportButtonState, updatePlaybackState, updateTimelineData } from './producerUIHandlers.js';
+import { createUIHandlers, updateTransportButtonState, updatePlaybackState, updateTimelineData } from './producerUiHandlers.js'
 import { fetchPlaylistData, findClipByClipName, setSelectedClip as coreSetSelectedClip, loadClipByCleanName } from './playlist.js';
 import { updatePlaylistDOM, setSelectedClip as uiSetSelectedClip } from './playlistDOM.js';
 
