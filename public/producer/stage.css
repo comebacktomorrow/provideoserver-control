@@ -1,0 +1,150 @@
+/* Reset some default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
+}
+
+body {
+  background-color: #000000; /* Background color for the body */
+  font-family: Helvetica, Arial, sans-serif; /* Default font */
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1920px; /* Maximum width for widescreen displays */
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}
+
+/* Playback control container */
+#playback-control-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Playback container */
+#playback-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Top container */
+#playback-top-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.left {
+  position: absolute;
+  left: 0;
+  color: #FFD838;
+}
+
+.mid {
+  margin: 0 auto;
+  color: rgb(0, 255, 149);
+}
+
+.right {
+  position: absolute;
+  right: 0;
+  color: grey;
+}
+
+/* Playback title */
+#playback-title {
+  width: 100%;
+  text-align: center;
+  font-size: calc(3em + 1.3vw);
+  color: white;
+  word-wrap: break-word; /* Ensure long words break to the next line */
+  margin: 20px 0;
+  height: 1.8em;
+}
+
+/* Mid container */
+#playback-mid-container {
+  width: 100%;
+  text-align: center;
+  margin: 10px 0;
+}
+
+#playback-status {
+  text-transform: capitalize !important;
+  border: 1px solid rgb(111, 111, 111);;
+  padding: 0.2em;
+  width: 500px;
+  text-align: center;
+  border-radius: 50px;
+}
+
+.primary {
+  font-size: 3em;
+  color: #FFD838;
+}
+
+#playback-behaviour {
+  background-color: rgb(111, 111, 111);
+  width: 5em;
+  height: 1.2em;
+  text-align: center;
+  border-radius: 0.5em;
+  font-size: 0.8em;
+  margin: 10px auto;
+  position:absolute;
+  right: 70px;
+  margin-top: -70px;
+}
+
+#playback-remaining2 {
+  color: grey;
+}
+
+/* Bottom container */
+#playback-bottom-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 70px;
+  position: absolute;
+  bottom: 0;
+}
+
+h2 {
+  color: #FFD838; 
+}
+
+h3 {
+  color: white;
+  font-size: 1.5em;
+}
+
+h4 {
+  color: #707070;
+}
+#playback-duration, #playback-count, #playback-remaining1, #playback-remaining2, #playback-timer-left, #playback-timer-right {
+  font-family: "Avenir Next", Helvetica, Arial, sans-serif !important; /* Default font */
+}
