@@ -2,8 +2,13 @@
   "name": "rv-pvs-proxy",
   "version": "1.0.0",
   "main": "index.js",
+  "bin": {
+    "pvs-controller": "./index.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "build": "pkg ."
   },
   "author": "",
   "license": "ISC",
@@ -17,5 +22,21 @@
     "winston": "^3.13.0",
     "ws": "^8.18.0",
     "xml2js": "^0.6.2"
+  },
+  "pkg": {
+    "scripts": [
+      "Interactive/**/*.js",
+      "REST/**/*.js",
+      "ProPresenter/**/*.js",
+      "TSL-UMD/**/*.js",
+      "ProVideoServerController.js"
+    ],
+    "assets": [
+      "PVSControl.json",
+      "public/**/*"
+    ],
+    "targets": [
+      "node18-macos-arm64"
+    ]
   }
 }
