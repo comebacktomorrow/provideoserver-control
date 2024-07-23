@@ -80,7 +80,7 @@ class ProVideoServerController {
         try {
             const data = await this.IDLoadedRequest();
             if (data.data.clipname[0] != this.currentClip.plnName || force === true){
-                logger.debug("CTRL: POLL - IDLoadRequest mismatch - a different clip has been loaded")
+                logger.debug("CTRL: POLL - IDLoadRequest data is different - a different new clip has been loaded")
                 //this.currentClip = await this.getClipByName(data.data.clipname[0], (err, clip));
                 this.getClipByName(data.data.clipname[0], (err, clip) => {
                             if (err) {
@@ -128,7 +128,7 @@ class ProVideoServerController {
             } catch (error) {
                 logger.warn('Error during polling:', error);
             }
-        }, 50); // Adjust the interval as needed
+        }, 54); // Adjust the interval as needed
     }
 
     stopPolling() {
@@ -199,6 +199,7 @@ class ProVideoServerController {
                   }
             } else {
                 this.transportState = 'PAUSED';
+                //logger.debug('paused' + JSON.stringify(this.currentTimecode));
                 this.clearAutoCueTimer();
             }
 
@@ -210,6 +211,7 @@ class ProVideoServerController {
 
     clearAutoCueTimer(){
         if (this.autoCueTimer) {
+            logger.info("CTRL: Autocue timer has been cleared")
             clearTimeout(this.autoCueTimer);
             this.autoCueTimer = null;
         }
@@ -228,10 +230,10 @@ class ProVideoServerController {
     }
 
     setAutoCueTimer() {
-        logger.debug("CTRL: AUTOCUE - Timer has been set")
+        logger.info("CTRL: AUTOCUE - Timer has been set")
         this.autoCueTimer = setTimeout(() => {
             if (this.transportState === 'AT_END' && !this.autoCueDisable && this.tallyState != 1) { // I don't know that tallystate here does anything
-                logger.debug("CTRL: AUTOCUE - AutoCue time out - queueing next clip");
+                logger.info("CTRL: AUTOCUE - AutoCue time out - queueing next clip");
                 this.queueNext();
                 clearTimeout(this.autoCueTimer);
             }
@@ -310,7 +312,7 @@ class ProVideoServerController {
     }
     
     async loadClipByIndex(index) {
-        logger.verbose(`CTRL: Called loadClipByIndex — ${index}`);
+        logger.info(`CTRL: Called loadClipByIndex — ${index}`);
         return new Promise((resolve, reject) => {
             this.getClipByIndex(index, (err, clip) => {
                 if (err) {
@@ -335,7 +337,7 @@ class ProVideoServerController {
     }
 
     async loadClipByName(name) {
-        logger.verbose(`CTRL: Called loadClipByName ${name}`);
+        logger.info(`CTRL: Called loadClipByName ${name}`);
         return new Promise((resolve, reject) => {
             this.getClipByName(name, (err, clip) => {
                 if (err) {
@@ -360,7 +362,7 @@ class ProVideoServerController {
     }
 
     async loadClipByCleanName(name) {
-        logger.verbose(`CTRL: Called loadClipByCleanName ${name}`);
+        logger.info(`CTRL: Called loadClipByCleanName ${name}`);
         return new Promise((resolve, reject) => {
             this.getClipByCleanName(name, (err, clip) => {
                 if (err) {
@@ -411,6 +413,7 @@ class ProVideoServerController {
 
 
     pause(){
+        logger.info('CTRL: Pause');
         this.currentTimeSense()
             .then(data => {
                 logger.debug(" CTRL: Pause - pausing at " + JSON.stringify(data.data.timecode))
@@ -426,6 +429,7 @@ class ProVideoServerController {
     }
 
     togglePlayback() {
+        logger.info('CTRL: Toggle playback');
         if (this.transportState == 'PLAYING'){
             this.pause();
             return 'PAUSED'
@@ -439,7 +443,7 @@ class ProVideoServerController {
     // we probably ideally would maintain state - keep playing if playing, and nothing if not
     // we technically should be using  frame rate as well - this.getClipSelected().data.fps
     jumpToTimecode(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
-        
+        logger.info('jumping to specific timecode');
                 let ts = this.transportState;
                 logger.debug("CTRL: jumpToTimecode — Jumping " + JSON.stringify(jumptime))
                 this.cueUpData({timecode: jumptime})
@@ -456,6 +460,7 @@ class ProVideoServerController {
     // we probably ideally would maintain state - keep playing if playing, and nothing if not
     // we technically should be using  frame rate as well - this.getClipSelected().data.fps
     jumpTime(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
+        logger.info('CTRL: Jumping to timecode back seconds from current timecode');
         this.currentTimeSense()
             .then(data => {
                 //console.log(" jumping at ", jumptime)
@@ -479,6 +484,7 @@ class ProVideoServerController {
 
     jumpBack(jumptime = {hours: 0, minutes: 0, seconds: 0, frames: 0}){
                 //let endtime = this.currentClip.duration;
+                logger.info('CTRL: Jumping to timecode back from end');
                 let endtime = this.currentClip.trt;
                 let tc = operateTimecodes(jumptime.timecode, endtime, 'subtract' )
                 let ts = this.transportState;
@@ -496,7 +502,7 @@ class ProVideoServerController {
 
 
     async requeueClip() {
-        logger.verbose("CTRL: requeueClip - called");
+        logger.info("CTRL: Requeue current Clip");
         try {
             const originalClip = await this.getLoadedClipPlaylistData();
             logger.verbose(`CTRL: requeueClip - Receieved getLoadedClipPlayListData:`, originalClip);
@@ -518,12 +524,13 @@ class ProVideoServerController {
     }
 
     queueNext() {
-        logger.debug("CTRL: queueNext called");
+        logger.info("CTRL: Queue Next Clip");
         return new Promise((resolve, reject) => {
             this.getClipSelected((err, clips) => {
                 if (err) {
                     reject(err);
                 } else {
+                    logger.debug(JSON.stringify(clips));
                     this.loadClipByIndex(clips.index + 1)
                         .then(() => {
                             this.getLoadedClipPlaylistData();
@@ -536,7 +543,7 @@ class ProVideoServerController {
     }
 
     queuePrevious() {
-        logger.debug("CTRL: queuePrevious called");
+        logger.info("CTRL: Queue Previous Clip");
         return new Promise((resolve, reject) => {
             this.getClipSelected((err, clips) => {
                 if (err) {
@@ -559,6 +566,7 @@ class ProVideoServerController {
     async cueUpData(data) {
         console.log(data);
         const command = AMPCommandFactory.createCommand('cueUpData', data, this.tcpClient);
+        //logger.info('Go to timecode');
         this.commandQueue.addCommand(command);
         try { 
             const response = await command.promise;
@@ -587,6 +595,7 @@ class ProVideoServerController {
     async stop() {
         const command = AMPCommandFactory.createCommand('stop', {}, this.tcpClient);
         this.commandQueue.addCommand(command);
+        logger.info('Stop');
         try { 
             const response = await command.promise;
             logger.debug('------CTRL: STOP - command succeeded', response);
@@ -599,16 +608,15 @@ class ProVideoServerController {
 
     //we use this to cue a clip \ make a clip active
     async inPreset(data) {
-        //logger.verbose("CTRL: Calling inPreset ", data)
+        logger.verbose("CTRL: Calling inPreset ", data)
         const command = AMPCommandFactory.createCommand('inPreset', data, this.tcpClient);
         this.commandQueue.addCommand(command);
-        
         try { 
             const response = await command.promise;
-            logger.debug('------CTRL: inPreset - command succeeded', response);
+            logger.debug('------CTRL: inPreset - cue lip command succeeded', response);
             return response;
         } catch(error) {
-                logger.error('------CTRL: inPreset - command failed', error);
+                logger.error('------CTRL: inPreset - cue clip command failed', error);
                 throw error;
             };
     }
@@ -617,7 +625,7 @@ class ProVideoServerController {
         //logger.verbose("CTRL: Calling play")
         const command = AMPCommandFactory.createCommand('play', data, this.tcpClient);
         this.commandQueue.addCommand(command);
-
+        logger.info('Play');
         try { 
             const response = await command.promise;
             logger.debug('------CTRL: Play - Command succeeded', response);
@@ -647,14 +655,20 @@ class ProVideoServerController {
     async currentTimeSense() {
         const command = AMPCommandFactory.createCommand('currentTimeSense', {}, this.tcpClient);
         this.commandQueue.addCommand(command);
-        try { 
+        try {
             const response = await command.promise;
             logger.verbose('------CTRL: currentTimeSense - command succeeded', response);
+    
+            // Check if frames value is longer than two digits
+            if (response.data.timecode && response.data.timecode.frames && response.data.timecode.frames.toString().length > 2) {
+                logger.warn('------CTRL: currentTimeSense - frames value is longer than two digits ' + response.data.timecode.frames);
+            }
+    
             return response;
-        } catch(error) {
-                logger.error('------CTRL: currentTimeSense - command failed', error);
-                throw error;
-            };
+        } catch (error) {
+            logger.error('------CTRL: currentTimeSense - command failed', error);
+            throw error;
+        }
     }
  
     // playlist functions - via AMP - legacy
