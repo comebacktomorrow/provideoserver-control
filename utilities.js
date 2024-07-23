@@ -70,7 +70,7 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
         frames = Math.round((frames - (hours * 3600 + minutes * 60) * screenRefreshRate * frameRateOR));
     } else if (frames > 60 && !frameRateOR){
         for (const frameRate of possibleFrameRates) {
-            let minFrameValue = (minutes * screenRefreshRate * frameRate);
+            let minFrameValue = Math.floor((minutes * screenRefreshRate * frameRate));
             if (hours > 0 ){ 
                 minFrameValue = (((hours* 3600) + minutes * 60) * screenRefreshRate * frameRate);
             }
@@ -83,6 +83,10 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
         }
     }
     logger.verbose('decoded frame as ' + timecode + " frame set to " + frames)
+
+    if (frames.toString().length > 2) {
+      logger.warn('UTIL: currentTimeSense - frames value is longer than two digits ' + frames);
+  }
 
     return { timecode: { frames, seconds, minutes, hours } };
 }

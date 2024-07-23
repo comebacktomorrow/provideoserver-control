@@ -19,6 +19,7 @@ class ProVideoServerController {
         this.currentTime = null; // State for current time
         this.clocks = [];
         this.previousTime = null; // Previous state for time
+        this.previousTime2 = null; // Previous state for time
         this.transportState = 'STOPPED'; // Initialize transport state
         this.libraryTimestamp = 0;
         this.tallyState = -1;
@@ -243,14 +244,22 @@ class ProVideoServerController {
             this.previousTime = now;
             return false;
         }
-    
-        // Compare each component of the timecode objects
-        if (this.previousTime.frames !== now.frames ||
-            this.previousTime.seconds !== now.seconds ||
-            this.previousTime.minutes !== now.minutes ||
-            this.previousTime.hours !== now.hours) {
-    
-            this.previousTime = now;
+
+        // Check if the second previous time is defined
+        if (!this.previousTime2) {
+            this.previousTime2 = now;
+            return false;
+        }
+
+        // Compare each component of the timecode objects with previous timecodes
+        if (
+            (this.previousTime2.frames !== now.frames ||
+            this.previousTime2.seconds !== now.seconds ||
+            this.previousTime2.minutes !== now.minutes ||
+            this.previousTime2.hours !== now.hours)) {
+
+            this.previousTime2 = this.previousTime; // Shift previous time to previousTime2
+            this.previousTime = now; // Update previous time to current time
             return true;
         } else {
             return false;
