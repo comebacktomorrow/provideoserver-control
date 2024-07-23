@@ -12,38 +12,66 @@ exports.getLoadedClip = (req, res) => {
 exports.loadClipByIndex = (req, res) => {
     const controller = req.app.get('controller');
     const { id } = req.params;
-    controller.loadClipByIndex(id);
-    res.status(200).send('Clip loaded by index');
+    try {
+        controller.loadClipByIndex(id);
+        res.status(200).json({ message: 'Clip loaded by index', clipId: id });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to load clip by index', error: error.message });
+    }
 };
 
 exports.loadClipByName = (req, res) => {
     const controller = req.app.get('controller');
     const { name } = req.params;
-    controller.loadClipByName(name);
-    res.status(200).send('Clip loaded by name');
+    try {
+        controller.loadClipByName(name);
+        res.status(200).json({ message: 'Clip loaded by name', clipName: name });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to load clip by name', error: error.message });
+    }
 };
 
 exports.loadClipByCleanName = (req, res) => {
     const controller = req.app.get('controller');
     const { cleanName } = req.params;
-    controller.loadClipByCleanName(cleanName);
-    res.status(200).send('Clip loaded by clean name');
+
+    try {
+        controller.loadClipByCleanName(cleanName);
+        res.status(200).json({ message: 'Clip loaded by clean name', cleanName: cleanName });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to load clip by clean name', error: error.message });
+    }
 };
 
 exports.queueNext = (req, res) => {
     const controller = req.app.get('controller');
-    controller.queueNext();
-    res.status(200).send('Next clip queued');
+
+    try {
+        controller.queueNext();
+        res.status(200).json({ message: 'Next clip queued' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to queue next clip', error: error.message });
+    }
 };
 
 exports.queuePrevious = (req, res) => {
     const controller = req.app.get('controller');
-    controller.queuePrevious();
-    res.status(200).send('Previous clip queued');
+
+    try {
+        controller.queuePrevious();
+        res.status(200).json({ message: 'Previous clip queued' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to queue previous clip', error: error.message });
+    }
 };
 
 exports.requeue = (req, res) => {
     const controller = req.app.get('controller');
-    controller.requeueClip();
-    res.status(200).send('Clip requeued');
+
+    try {
+        controller.requeueClip();
+        res.status(200).json({ message: 'Clip requeued' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to requeue clip', error: error.message });
+    }
 };
