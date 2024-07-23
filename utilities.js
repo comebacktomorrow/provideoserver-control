@@ -75,11 +75,12 @@ function unpackRawTimecode(timecode, frameRateOR = null) {
                 minFrameValue = (((hours* 3600) + minutes * 60) * screenRefreshRate * frameRate);
             }
             const maxFrameValue = minFrameValue + frameRate - 1;
-            //console.log("########################NO FR OR fr " + frameRate + " min " + minFrameValue + " max " + maxFrameValue);
+            //console.log("########################NO FR OR fr " + frameRate + " min " + minFrameValue + " max " + maxFrameValue + " actual " + frames);
             if (frames >= minFrameValue && frames <= maxFrameValue) {
                 const trueFrameValue = frames - minFrameValue;
+                
                 frames = Math.round(trueFrameValue);
-            }
+            } 
         }
     }
     logger.verbose('decoded frame as ' + timecode + " frame set to " + frames)
