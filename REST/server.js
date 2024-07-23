@@ -35,6 +35,15 @@ const startWebServer = (controller, port) => {
   app.use("/API/PVS/transport/times", transportTimeRoutes);
 
   initializeWebSocket(server, controller);
+  // Specific routes for other HTML files
+  app.get('/producer/producer', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/producer', 'producer.html'));
+  });
+
+  app.get('/producer/stage', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/producer', 'stage.html'));
+  });
+
 
   const PORT = process.env.PORT || port;
 

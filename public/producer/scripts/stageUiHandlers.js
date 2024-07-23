@@ -4,6 +4,8 @@ import { fetchPlaylistData, findClipByClipName } from './playlist.js';
 export let selectedClipData = {};
 
 let intervalId = null;
+let playbackState = 'Unknown State';
+let isOnAir = -1;
 
 export const updateTimer = (timerName, time, label = '') => {
     document.getElementById(`${timerName}`).innerText = label + time;
@@ -21,6 +23,36 @@ export const updateTransportButtonState = state => {
     //not required
 };
 
+export const stageTimer = () => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+   
+    const hideClock = urlParams.get('hidetime');
+    const vidClock = urlParams.get('tally');
+
+    let vcOverride = false
+    if (vidClock == 1) {
+        vcOverride = true
+    }
+
+    if (hideClock == 1) {
+        const todElement = document.getElementById('playback-count');
+        todElement.classList.add('hide');
+    }
+
+
+    const timerElement = document.getElementById('playback-duration');
+    //document.getElementById('playback-status').innerText = text;
+   
+    if (playbackState == 'Playing' && (isOnAir || vcOverride)) {
+        //console.log('show please')
+        timerElement.classList.remove('hide');
+    } else {
+        timerElement.classList.add('hide');
+        //console.log('hide please' + playbackState + isOnAir)
+    }
+}
+
 export const updatePlaybackState = state => {
     const stateTextMapping = {
         'AT_START': 'Standby',
@@ -30,9 +62,8 @@ export const updatePlaybackState = state => {
         'CUEING': 'Seeking',
         // Add more state mappings as needed
     };
-
     const text = stateTextMapping[state] || 'Unknown State';
-    //document.getElementById('playback-status').innerText = text;
+    playbackState = text;
 };
 
 export const createUIHandlers = (specificHandlers) => {
@@ -59,6 +90,7 @@ export const createUIHandlers = (specificHandlers) => {
         });
         },
         onStateChange: (socketData) => {
+            console.log('updating state');
             updatePlaybackState(socketData.state);
             updateTransportButtonState(socketData.state);
         },
@@ -103,11 +135,19 @@ export const createUIHandlers = (specificHandlers) => {
             const remain = calcTimeRemainingAsString(socketData.timecode, selectedClipData.duration, frameRate);
             
             updateTimer('playback-duration', simpleTime(findSmallestRemainingTime(selectedClipData, socketData.timecode, frameRate).result.toString()));
-
+            stageTimer();
         },
         onTallyUpdate: (tallyState) => {
-            //do nothing
+            if (tallyState == 0){
+                //console.log("preview");
+                isOnAir = false;
+            } else if (tallyState == 1) {
+                //console.log("program");
+                isOnAir = true;
+            } else {
+                //console.log("clear" + tallyState);
+                isOnAir = false;
+            }
         }
-        
     };
 };

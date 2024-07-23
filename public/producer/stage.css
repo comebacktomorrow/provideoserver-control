@@ -148,3 +148,7 @@ h4 {
 #playback-duration, #playback-count, #playback-remaining1, #playback-remaining2, #playback-timer-left, #playback-timer-right {
   font-family: "Avenir Next", Helvetica, Arial, sans-serif !important; /* Default font */
 }
+
+.hide {
+  visibility: hidden;
+}

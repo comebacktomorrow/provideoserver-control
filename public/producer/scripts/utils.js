@@ -47,7 +47,7 @@ export const findSmallestRemainingTime = (selectedClipData, currentTimecode, fra
         selectedClipData.t1,
         selectedClipData.t2,
         selectedClipData.trt,
-        selectedClipData.duration
+        //selectedClipData.duration
     ];
 
     // Calculate remaining time for each timecode
