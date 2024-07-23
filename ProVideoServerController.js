@@ -24,7 +24,7 @@ class ProVideoServerController {
         this.libraryTimestamp = 0;
         this.tallyState = -1;
 
-
+        this.pauseTimer = null;
         //this.currentClipObj = [];
 
         this.autoCueTimer = null;
@@ -128,7 +128,7 @@ class ProVideoServerController {
             } catch (error) {
                 logger.warn('Error during polling:', error);
             }
-        }, 54); // Adjust the interval as needed
+        }, 50); // Adjust the interval as needed
     }
 
     stopPolling() {
@@ -255,16 +255,36 @@ class ProVideoServerController {
 
         // Compare each component of the timecode objects with previous timecodes
         if (
-            (this.previousTime2.frames !== now.frames ||
+            this.previousTime2.frames !== now.frames ||
             this.previousTime2.seconds !== now.seconds ||
             this.previousTime2.minutes !== now.minutes ||
-            this.previousTime2.hours !== now.hours)) {
-
+            this.previousTime2.hours !== now.hours
+        ) {
             this.previousTime2 = this.previousTime; // Shift previous time to previousTime2
             this.previousTime = now; // Update previous time to current time
+
+            if (this.pauseTimer) {
+                clearTimeout(this.pauseTimer);
+                this.pauseTimer = null;
+                //console.log('clear timer, playing');
+            }
+
+            this.isCurrentlyPlaying = true;
             return true;
         } else {
-            return false;
+            //console.log('now ' + JSON.stringify(now) + " p2 " + JSON.stringify(this.previousTime2));
+
+            if (!this.pauseTimer) {
+                this.pauseTimer = setTimeout(() => {
+                    this.isCurrentlyPlaying = false;
+                    this.pauseTimer = null; // Reset the timer
+                    //console.log('is not playing, return false');
+                }, 100);
+            } else {
+                //console.log('bypass timer .. timer already set ' + this.pauseTimer);
+            }
+
+            return this.isCurrentlyPlaying;
         }
     }
 
