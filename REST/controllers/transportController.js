@@ -1,4 +1,4 @@
-//const logger = require('./logger');
+const logger = require('../../logger');
 const { secondsToTimecode } = require("../../utilities");
 
 exports.play = (req, res) => {
@@ -88,11 +88,11 @@ exports.cueUpData = async (req, res) => {
 
     try {
         if (timecode && !timecode.percentage) {
-            console.log('Setting playhead to timecode:', timecode);
+            logger.debug('Setting playhead to timecode:', timecode);
             await controller.jumpToTimecode(timecode); // Using await for async operation
             res.status(200).send('Playhead set to timecode.');
         } else if (timecode && timecode.percentage !== undefined) {
-            console.log('Setting playhead to percentage:', timecode.percentage);
+            logger.debug('Setting playhead to percentage:', timecode.percentage);
 
             // Get selected clip asynchronously
             const clip = await new Promise((resolve, reject) => {
@@ -119,7 +119,7 @@ exports.cueUpData = async (req, res) => {
                 frames: Math.floor(targetFrame % clip.fps),
             };
 
-            console.log('Calculated timecode from percentage:', calculatedTimecode);
+            logger.verbose('Calculated timecode from percentage:', calculatedTimecode);
 
             // Jump to calculated timecode asynchronously
             await controller.jumpToTimecode(calculatedTimecode);

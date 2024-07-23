@@ -564,7 +564,7 @@ class ProVideoServerController {
     // we use this to cue up timecode
     // expects
     async cueUpData(data) {
-        console.log(data);
+        //console.log(data);
         const command = AMPCommandFactory.createCommand('cueUpData', data, this.tcpClient);
         //logger.info('Go to timecode');
         this.commandQueue.addCommand(command);
