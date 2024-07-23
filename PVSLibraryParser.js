@@ -14,6 +14,7 @@ class PVSLibraryParser {
         this.playlistFilePath = path.join(this.homeDirectory, 'Documents/ProVideoServer.pvs3');
         this.playlist = [];
         this.libraryUpdate = 0;
+        this.modifications = {}; // Temporary storage for modifications
         
         this.setupFileWatcher();
     }
@@ -46,19 +47,16 @@ class PVSLibraryParser {
                     reject(err);
                     return;
                 }
-    
+
                 xml2js.parseString(xmlData, (err, result) => {
                     if (err) {
                         reject(err);
                         return;
                     }
-                    // Channel is currently hardcoded
-                    const channels = result.PVSPlaylist.array[0].PVSChannel;
+
+                    const channels = result.PVSPlaylist.array[0].PVSChannel; //hardcoded channel atm
                     let playlistNodes = [];
-    
-                    //we need a better way to merge information
-                    //mostly we care about correct indexing, and playBack behaviour
-                    //it's possible we need to watch UUIDs :( 
+
                     if (channels) {
                         channels.forEach(channel => {
                             if (channel.$.channelNumber === this.channelNumber.toString()) {
@@ -67,6 +65,8 @@ class PVSLibraryParser {
                                         const parsedNode = this.extractAdditionalAttributes(node);
                                         parsedNode.index = index;
                                         parsedNode.isSelected = false;
+                                        parsedNode.uuid = node.$.UUID; // Use existing UUID
+                                        //console.log(node.$.UUID)
                                         return parsedNode;
                                     });
                                     playlistNodes = this.playlist;
@@ -74,12 +74,41 @@ class PVSLibraryParser {
                             }
                         });
                     }
-    
-                    logger.debug("Library Parser: Load Play List - loaded playlist sucessfully")
+
+                    // Clean up modifications for deleted clips
+                    this.cleanupModifications();
+
+                    // Reapply modifications
+                    this.applyModifications();
+
+                    logger.debug("Library Parser: Load Play List - loaded playlist successfully");
                     this.libraryUpdate = Date.now();
+                    resolve();
                 });
             });
         });
+    }
+
+    cleanupModifications() {
+        const currentUUIDs = this.playlist.map(clip => clip.UUID);
+        for (const key of Object.keys(this.modifications)) {
+            const [uuid] = key.split('_');
+            if (!currentUUIDs.includes(uuid)) {
+                console.log('deleting pl item' + uuid)
+                delete this.modifications[key];
+            }
+        }
+    }
+
+    applyModifications() {
+        for (const [key, value] of Object.entries(this.modifications)) {
+            const [uuid, timer] = key.split('_');
+            const clip = this.playlist.find(node => node.UUID === uuid);
+            console.log('uuid match '+ uuid);
+            if (clip) {
+                clip[timer] = value;
+            }
+        }
     }
 
     extractTimecode(fileName, tag, duration, fps) {
@@ -279,37 +308,31 @@ class PVSLibraryParser {
     setClipTimerByClipName(name, timer, timecode, callback) {
         logger.verbose('PVSLibrary Parser (playlist): setClipTimer for', name);
         const clip = this.playlist.find(node => node.plnName === name);
-    
-        // Perform additional actions
+
         if (clip) {
-            logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip}. Set clip ${timer} to`, timecode);;
+            logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip}. Set clip ${timer} to`, timecode);
             clip[timer] = timecode; // Dynamically set the property name
+            this.modifications[`${clip.uuid}_${timer}`] = timecode; // Save modification using UUID
             this.libraryUpdate = Date.now(); // Trigger a virtual update of the playlist time
         } else {
-           logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', clip);
+            logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', name);
         }
-    
-        // If you need a callback, you can call it here
+
         callback(null, clip);
     }
 
     setClipTimerByClipIndex(index, timer, timecode, callback) {
         logger.verbose('PVSLibrary Parser (playlist): setClipTimer for', index);
         const clip = this.playlist[index];
-        console.log(JSON.stringify(clip));
-        // Perform additional actions
         if (clip) {
-            logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip.cleanName}. Set clip ${timer} to ${timecode}`);;
+            logger.debug(`PVSLibrary Parser (playlist): setClipTimer for ${clip.cleanName}. Set clip ${timer} to ${timecode}`);
             clip[timer] = timecode; // Dynamically set the property name
+            this.modifications[`${clip.uuid}_${timer}`] = timecode; // Save modification using UUID
             this.libraryUpdate = Date.now(); // Trigger a virtual update of the playlist time
-             // If you need a callback, you can call it here
             callback(null, clip);
         } else {
-           logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', clip);
+            logger.error('PVSLibrary Parser (playlist): setClipTimer could not find clip', index);
         }
-    
-       
-        
     }
 
     getLibraryUpdate() {
@@ -321,20 +344,5 @@ class PVSLibraryParser {
         callback(null, this.playlist.find(node => node.isSelected));
     }
 }
-
-// // Example usage
-// const manager = new PlaylistManager(1); // Set channel number when creating an instance
-// manager.loadPlaylist((err, playlistNodes) => {
-//     if (err) {
-//         console.error(err);
-//         return;
-//     }
-
-//     console.log(manager.getAllClips()); // Example query to get all clips
-//     console.log(manager.getClipByName('A2400')); // Example query by name
-//     console.log(manager.getClipByIndex(2)); // Example query by index
-//     manager.selectClip(2); // Select clip at index 2
-//     console.log(manager.getSelectedClip()); // Get the currently selected clip
-// });
 
 module.exports = PVSLibraryParser;
