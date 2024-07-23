@@ -2,6 +2,7 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
+const logger = require('../logger');
 const initializeWebSocket = require("./websocket");
 const path = require('path');
 const playlistRoutes = require("./routes/playlistRoutes");
@@ -38,7 +39,8 @@ const startWebServer = (controller, port) => {
   const PORT = process.env.PORT || port;
 
   server.listen(PORT, () => {
-    console.log(`Server is running on port ${port}`);
+    logger.info(`Web server is running on port ${port}.`);
+    logger.info(`Pages are http://localhost:${port}/, http://localhost:${port}/producer/producer and http://localhost:${port}/producer/stage`);
   });
 };
 

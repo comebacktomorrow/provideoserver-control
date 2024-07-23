@@ -1,11 +1,12 @@
 //index.js
 const fs = require('fs');
 const path = require('path');
+const logger = require('./logger');
 const ProVideoServerController = require('./ProVideoServerController');
 const startInteractiveConsole = require('./Interactive/interactive');
 const startWebServer = require('./REST/server');
 const { updateAllTimers } = require('./ProPresenter/ProPresenterTimers');
-const { umd } = require('./TSL-UMD/tsl-umd');
+//const { umd } = require('./TSL-UMD/tsl-umd');
 //const { sendUMDMessage } = require('./TSL-UMD/tsl-umd-send'); 
 const goUMD = require('./TSL-UMD/tsl-umd');
 
@@ -15,8 +16,10 @@ const getConfigFilePath = () => {
     const localPath = path.resolve(__dirname, 'PVSControl.json');
     
     if (fs.existsSync(documentsPath)) {
+        logger.info('Found config file in documents path');
         return documentsPath;
     } else if (fs.existsSync(localPath)) {
+        logger.info('Config file not found in documents path, will local in local directory instead');
         return localPath;
     } else {
         throw new Error('PVSControl.json not found in either Documents folder or local directory.');
@@ -59,8 +62,8 @@ startInteractiveConsole(controller);
 startWebServer(controller, WEB_PORT);
 
 //this is how we're updating the propresenter timers
-// setInterval(() => {
-//         updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
+ setInterval(() => {
+         updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
 //         sendUMDMessage(controller, '127.0.0.1', TSL_PORT, controller);
-// }, 1000);
+ }, 1000);
 

@@ -1,9 +1,11 @@
 const http = require('http');
+const logger = require('../logger');
         let previousState = null;
         let previousTimecode = null;
         let previousClipName = null;
         let previousLibraryTimestamp = null;
         let forceUpdate = false;
+        let connectionStatus = 'not connected'
         const SPECIFIC_TIMER_NAMES = ['PVS Time Remaining', 'PVS Timer 1', 'PVS Timer 2', 'PVS TRT']; // Replace with the 
 
         const TIMER_MAPPING = {
@@ -43,8 +45,6 @@ function updateTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, timer) {
     const { name } = timer.id;
     const encodedName = encodeURIComponent(name);
     const data = JSON.stringify(timer);
-
-    console.log("Sending data : " + data)
 
     const options = {
         hostname: PRO_PRESENTER_IP,
@@ -92,13 +92,13 @@ function updateSpecificTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, name, duratio
             };
 
             return updateTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, updatedTimer)
-                .then(() => console.log(`Successfully updated timer: ${name}`))
-                .catch((error) => console.error(`Error updating timer ${name}:`, error));
+                .then(() => logger.verbose(`Successfully updated timer: ${name}`))
+                .catch((error) => logger.error(`Error updating timer ${name}:`, error));
         } else {
-            console.error(`Timer with name ${name} not found.`);
+            logger.error(`Timer with name ${name} not found.`);
         }
     }).catch(error => {
-        console.error('Error fetching timers:', error);
+        logger.error('Error fetching timers:', error);
     });
 }
 
@@ -128,7 +128,11 @@ async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)
         if (hasChanged) {
             // Logic to update all timers based on controller data
             const timers = await fetchTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT);
-
+            if (connectionStatus != 'Connected'){
+                logger.info('Connected to ProPresenter');
+                connectionStatus ='Connected';
+            }
+            
             timers.forEach(timer => {
                 if (SPECIFIC_TIMER_NAMES.includes(timer.id.name) && timer.countdown) {
                     // Use the internal name/ID to get the remaining time from the controller
@@ -139,8 +143,6 @@ async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)
                     if (state != "PLAYING" || controller.clocks[internalName].negative){
                         remainingTime = 0;
                     }
-
-                    console.log();
 
                     //if the thing we're comparing has a different value than time remaining, and is not time remaining
                     if (remainingTime == timecodeToSeconds(timecode) && internalName != 'remaining'){
@@ -155,8 +157,8 @@ async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)
                     };
 
                     updateTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, updatedTimer)
-                        .then(() => console.log(`Successfully updated timer: ${timer.id.name}`))
-                        .catch((error) => console.error(`Error updating timer ${timer.id.name}:`, error));
+                        .then(() => logger.verbose(`Successfully updated timer: ${timer.id.name}`))
+                        .catch((error) => logger.error(`Error updating timer ${timer.id.name}:`, error));
                 }
             });
 
@@ -167,7 +169,12 @@ async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)
             previousLibraryTimestamp = libraryTimestamp;
         }
     } catch (error) {
-        console.error('Error updating all timers:', error);
+        
+        if (connectionStatus != 'error'){
+            logger.error('Error connecting to ProPresenter timers:');
+            connectionStatus ='error';
+        }
+            
     }
 }
 

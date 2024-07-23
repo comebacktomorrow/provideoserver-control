@@ -1,10 +1,11 @@
 const WebSocket = require('ws');
+const logger = require('../logger');
 
 function initializeWebSocket(server, controller) {
     const wss = new WebSocket.Server({ server });
 
     wss.on('connection', (ws) => {
-        console.log('Client connected');
+        logger.info('Client connected via websocket');
 
         let previousState = null;
         let previousTimecode = null;
@@ -29,11 +30,11 @@ function initializeWebSocket(server, controller) {
         }));
 
         ws.on('message', (message) => {
-            console.log(`Received message: ${message}`);
+            logger.debug(`Received message: ${message}`);
         });
 
         ws.on('close', () => {
-            console.log('Client disconnected');
+            logger.debug('Websocket client disconnected');
             clearInterval(updateInterval);  // Clear the interval on disconnect
             clearInterval(forceUpdateInterval);  // Clear the force update interval on disconnect
         });
@@ -85,11 +86,11 @@ function initializeWebSocket(server, controller) {
                         // Reset force update flag
                         forceUpdate = false;
                     } catch (error) {
-                        console.error('WebSocket send error:', error);
+                        logger.error('WebSocket send error:', error);
                     }
                 }
             } else {
-                console.log('WebSocket is not open. Ready state:', ws.readyState);
+                logger.warn('WebSocket is not open. Ready state:', ws.readyState);
             }
         }
 
@@ -97,7 +98,7 @@ function initializeWebSocket(server, controller) {
         // Assuming you have a way to trigger this function on changes
     });
 
-    console.log('WebSocket server is running');
+    logger.info('WebSocket server is running');
 }
 
 module.exports = initializeWebSocket;
