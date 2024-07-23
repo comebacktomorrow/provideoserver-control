@@ -1,6 +1,8 @@
 //index.js
 const fs = require('fs');
 const path = require('path');
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 const logger = require('./logger');
 const ProVideoServerController = require('./ProVideoServerController');
 const startInteractiveConsole = require('./Interactive/interactive');
@@ -9,6 +11,31 @@ const { updateAllTimers } = require('./ProPresenter/ProPresenterTimers');
 //const { umd } = require('./TSL-UMD/tsl-umd');
 //const { sendUMDMessage } = require('./TSL-UMD/tsl-umd-send'); 
 const goUMD = require('./TSL-UMD/tsl-umd');
+
+const isPackaged = typeof process.pkg !== 'undefined';
+
+let argv = {};
+if (!isPackaged) {
+  argv = yargs(hideBin(process.argv))
+    .option('logLevel', {
+      alias: 'l',
+      description: 'Set the log level for Winston logger',
+      type: 'string',
+      default: 'debug'
+    })
+    .help()
+    .alias('help', 'h')
+    .argv;
+} else {
+  // Default arguments for packaged application
+  argv.logLevel = 'info';
+}
+
+// Set the logger level based on the command-line argument or default
+logger.setLevel(argv.logLevel);
+
+logger.info(`Starting application with log level: ${argv.logLevel}`);
+
 
 const getConfigFilePath = () => {
     const homeDirectory = process.env.HOME || process.env.USERPROFILE;

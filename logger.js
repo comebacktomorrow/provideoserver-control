@@ -32,7 +32,6 @@ const logFormat = printf(({ level, message, timestamp }) => {
 
 const logger = createLogger({
     levels: customLevels.levels,
-    level: 'debug', // Default log level
     format: combine(
         colorize(),
         timestamp(),
@@ -42,5 +41,9 @@ const logger = createLogger({
         new transports.Console()
     ]
 });
+
+logger.setLevel = (level) => {
+    logger.level = level;
+};
 
 module.exports = logger;
