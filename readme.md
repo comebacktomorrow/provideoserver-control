@@ -23,6 +23,10 @@ This companion application is designed to make the most under-appreciated Renewe
 To get the application running, download the latest binary and run it on the same machines as PVS.
 This app accesses the PVS Playlist XML file to get its metadata, which provides access to things like frame rate, codec and resolution. 
 
+- The web interface can be accessed from http://localhost:port/
+- The Production control screen can be accessed from localhost:port/producer/producer.html
+- The Stage Display output can be accessed from localhost:port/producer/stage.html
+
 ## Requirements
 
  1. This app **does not support In and Out points**. These are not updated
@@ -71,6 +75,10 @@ Control is the web interface port, PVS is the AMP protocol port, Pro_Presenter i
 It should be possible to extend the app to work with multiple PVS channels to work in either a main + backup format, a main + backup\alt playback format (using tags), or and A\B mode.
 Also possible is the retrieval of clip thumbnails via Quicklook and displaying those on the various interfaces.
 Finally, it should also be possible to transmit TLS data to Ross video switchers to expose clip or timer information to the multi view.
+
+## Development & Building
+With NodeJS installed, you can run this program from the command line using node index.js from the project root directory. 
+The binary can be created by first running npm install -g pkg, and then npm run build.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
