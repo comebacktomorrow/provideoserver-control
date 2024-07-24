@@ -321,3 +321,33 @@ button:hover {
     font-size: 1rem;
     color: #ffffff;
 }
+
+#tallywrapper {
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Horizontal center */
+    align-items: center; /* Vertical center */
+    width: 100%
+}
+
+#tally {
+    display: flex;
+    justify-content: center; /* Horizontal center for content inside the div */
+    align-items: center; /* Vertical center for content inside the div */
+    margin: 0 25% 0 25%;
+    height: 1em;
+    background-color: rgb(38, 38, 38);
+    border-radius: 1em;
+    box-shadow: rgba(0, 0, 0, 0.0) 0 0 5px 5px;
+    transition: background-color 0.5s, box-shadow 0.5s; /* Add transitions */
+}
+
+#tally.program {
+    background-color: red !important;
+    box-shadow: rgba(255, 0, 0, 0.2) 0 0 5px 5px !important;
+}
+
+#tally.preview {
+    background-color: #00ff3c !important;
+    box-shadow: rgba(98, 255, 0, 0.2) 0 0 5px 5px !important;
+}

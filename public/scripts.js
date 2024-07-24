@@ -4,6 +4,7 @@ let currentClip = [];
 let currentTimecode = []
 let currentLibraryTimeStamp = '';
 let userInteracting = false; //slider interaction
+let currentTally = -1;
 
 // Derive URL from the current page URL
 const loc = window.location;
@@ -60,7 +61,7 @@ function jumpToTimerTimecode(timer) {
 }
 
 let debounceTimeout;
-function handleRangeChange(value) {
+function handleRangeChange(value, clip) {
     clearTimeout(debounceTimeout);
 
     debounceTimeout = setTimeout(() => {
@@ -177,6 +178,23 @@ function newCalcTimecode(time1, time2, fps){
 function updateStatus(data) {
     const clipInfo = getClipInfoByName(data.clipName);
     currentClip = data; //new code
+    
+    console.log(data.tallyState);
+    const tallyDiv = document.getElementById('tally');
+    
+    if (data.tallyState == 0){
+        console.log("preview")
+        tallyDiv.classList.add('preview');
+        tallyDiv.classList.remove('program');
+    } else if (data.tallyState == 1) {
+        console.log("program")
+        tallyDiv.classList.add('program');
+        tallyDiv.classList.remove('preview');
+    } else {
+        console.log("clear")
+        tallyDiv.classList.remove('preview');
+        tallyDiv.classList.remove('program');
+    }
     
 
     // if the timestamp has changed, it means we need to trigger a playlist refresh
