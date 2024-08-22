@@ -5,7 +5,8 @@
     "IP_ADDRESS": "127.0.0.1",
     "PORT": 3811,
     "CHANNEL_NUMBER": 1,
-    "CHANNEL_NAME": "Vtr1"
+    "CHANNEL_NAME": "Vtr1",
+    "AUTO_QUEUE_DISABLE": true
   },
   "PRO_PRESENTER": {
     "IP_ADDRESS": "localhost",

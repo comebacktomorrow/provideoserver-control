@@ -64,7 +64,8 @@ const {
         IP_ADDRESS: PVS_IP_ADDRESS,
         PORT: PVS_PORT,
         CHANNEL_NUMBER: PVS_CHANNEL_NUMBER,
-        CHANNEL_NAME: PVS_CHANNEL_NAME
+        CHANNEL_NAME: PVS_CHANNEL_NAME,
+        AUTO_QUEUE_DISABLE: PVS_AUTO_QUEUE
     },
     PRO_PRESENTER: {
         IP_ADDRESS: PRO_PRESENTER_IP,
@@ -78,7 +79,7 @@ const {
 
 
 
-const controller = new ProVideoServerController(PVS_IP_ADDRESS, PVS_PORT, PVS_CHANNEL_NUMBER, PVS_CHANNEL_NAME);
+const controller = new ProVideoServerController(PVS_IP_ADDRESS, PVS_PORT, PVS_CHANNEL_NUMBER, PVS_CHANNEL_NAME, PVS_AUTO_QUEUE);
 
 goUMD(controller, TSL_PORT, TSL_ADDRESS);
 

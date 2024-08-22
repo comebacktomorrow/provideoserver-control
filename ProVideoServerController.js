@@ -7,7 +7,7 @@ const logger = require('./logger');
 const { operateTimecodes, timecodeToFrames } = require('./utilities');
 
 class ProVideoServerController {
-    constructor(ip, port, channelNumber, channelName) {
+    constructor(ip, port, channelNumber, channelName, autoQueueConfig) {
         this.tcpClient = new TCPClient(ip, port);
         this.commandQueue = new AMPCommandQueue();
         this.tcpClient.setController(this); // Pass the controller to the TCP client
@@ -29,7 +29,7 @@ class ProVideoServerController {
 
         this.autoCueTimer = null;
         this.AUTO_CUE_TIMER = 5000;
-        this.autoCueDisable = false;
+        this.autoCueDisable = autoQueueConfig;
         //this.AUTO_CUE_SET = false;
         //VAR AUTO_CUE_ENABLED = true;
 
@@ -230,12 +230,12 @@ class ProVideoServerController {
     }
 
     setAutoCueTimer() {
-        logger.info("CTRL: AUTOCUE - Timer has been set")
+        logger.info("CTRL: AUTOCUE - End of clip status and timer set.")
         this.autoCueTimer = setTimeout(() => {
+            clearTimeout(this.autoCueTimer); // TODO: this should probably happen outside of the if statement
             if (this.transportState === 'AT_END' && !this.autoCueDisable && this.tallyState != 1) { // I don't know that tallystate here does anything
                 logger.info("CTRL: AUTOCUE - AutoCue time out - queueing next clip");
                 this.queueNext();
-                clearTimeout(this.autoCueTimer);
             }
         }, this.AUTO_CUE_TIMER);
     }
