@@ -79,6 +79,44 @@ function updateTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, timer) {
     });
 }
 
+function resetTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, timer) {
+    const { name } = timer.id;
+    const encodedName = encodeURIComponent(name);
+    const data = '';
+
+    const options = {
+        hostname: PRO_PRESENTER_IP,
+        port: PRO_PRESENTER_PORT,
+        path: `/v1/timer/${encodedName}/reset`,
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length,
+        },
+    };
+
+    return new Promise((resolve, reject) => {
+        const req = http.request(options, (res) => {
+            let response = '';
+
+            res.on('data', (chunk) => {
+                response += chunk;
+            });
+
+            res.on('end', () => {
+                resolve(response);
+            });
+        });
+
+        req.on('error', (e) => {
+            reject(e);
+        });
+
+        req.write(data);
+        req.end();
+    });
+}
+
 function updateSpecificTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, name, duration, allowsOverrun) {
     return fetchTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT).then(timers => {
         const timer = timers.find(timer => timer.id.name === name);
@@ -159,6 +197,13 @@ async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)
                     updateTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, updatedTimer)
                         .then(() => logger.verbose(`Successfully updated timer: ${timer.id.name}`))
                         .catch((error) => logger.error(`Error updating timer ${timer.id.name}:`, error));
+
+                    setTimeout(() => {
+                        resetTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, updatedTimer)
+                        .then(() => logger.verbose(`Successfully reset timer to update time: ${timer.id.name}`))
+                        .catch((error) => logger.error(`Error resetting timer ${timer.id.name}:`, error));
+                        }, 900);
+                   
                 }
             });
 
