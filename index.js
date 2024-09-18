@@ -62,10 +62,32 @@ const getConfigFilePath = () => {
     } else {
         throw new Error('PVSControl.json not found in either Documents folder or local directory.');
     }
+  const homeDirectory = process.env.HOME || process.env.USERPROFILE;
+  const documentsPath = path.join(
+    homeDirectory,
+    "Documents",
+    "PVSControl.json"
+  );
+  const localPath = path.resolve(__dirname, "PVSControl.json");
+
+  if (fs.existsSync(localPath)) {
+    logger.info("Found config file in local directory");
+    return localPath;
+  } else if (fs.existsSync(documentsPath)) {
+    logger.info(
+      "Config file not found in local directory, checking Documents folder instead"
+    );
+    return documentsPath;
+  } else {
+    throw new Error(
+      "PVSControl.json not found in either local directory or Documents folder."
+    );
+  }
 };
 
 const configPath = getConfigFilePath();
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 const {
     CONTROL: {
