@@ -24,11 +24,14 @@ export const updateStatus = (socketData, updateHandlers) => {
         onClipChange(socketData);
     }
 
+    // this will probably have the issue that we need to flatten the object 
+    // otehrwise it will aways be seen as different
     if (currentTimecode !== socketData.timecode) {
         currentTimecode = socketData.timecode;
         onTimecodeUpdate(socketData);
     }
 
+    // this will always be called :\
     onTallyUpdate(socketData.tallyState);
     previousClip = socketData;
 };

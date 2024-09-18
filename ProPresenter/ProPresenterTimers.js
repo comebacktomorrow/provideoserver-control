@@ -41,6 +41,13 @@ function fetchTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT) {
     });
 }
 
+// this is the code that actually updates the value .. this might not be so important any more
+// data req.write(data) is the data to  be written
+// the function is called from updateAllTimers.
+
+// this should need to change a little bit. We will now only need to update timers on clip change? maybe? 
+//**Does ProPresenter seperate preset time from the actual count time?**
+
 function updateTimer(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, timer) {
     const { name } = timer.id;
     const encodedName = encodeURIComponent(name);
@@ -145,6 +152,17 @@ function timecodeToSeconds(time){
 }
 
 
+// this is what is called every second from index.js 
+// we can get the preset duration via http://localhost:50050/v1/timer/2 (using id)
+// the current remaining time is returned via http://localhost:50050/v1/timers/current
+
+// in theory:
+// 1) we want to check if the clip name has changed, and if so, update the time values
+// 2) watch the play state .. if the play state has changed, we want it to reflect that
+// 3) watch the timer value .. athough, if the timer value gets too far out of sync, we can't really do anything. Maybe just give a warning.
+// ++ We'll have to think about what we do with seeking timers.
+
+
 async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller) {
     try {
         // Example of fetching information from the controller
@@ -155,6 +173,9 @@ async function updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)
         const clocks = controller.getCurrentClocks();
 
         //const remainingTimeT1 = timecodeToSeconds(clocks.remaining);
+
+
+
 
         // Check if any data has changed
         const hasChanged = (

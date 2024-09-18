@@ -61,23 +61,24 @@ export const createUIHandlers = (specificHandlers) => {
             updateTransportButtonState(socketData.state);
         },
         onClipChange: async (socketData) => {
-            updatePlaybackState(socketData.state); 
-            updateTransportButtonState(socketData.state);
+            updatePlaybackState(socketData.state); // we're doing this down below as well?
+            updateTransportButtonState(socketData.state); // we're doing this down below as well?
 
-        fetchPlaylistData().then(() => {
-            selectedClipData = findClipByClipName(socketData.clipName);
-            if (selectedClipData) {
-                //console.log('Playlist update recieved. Updating playlist.')
-                //updatePlaylistDOM; //we then refresh the dom
-                document.getElementById('playback-title').innerText = socketData.clipName.replace(/\[[^\]]*\]/g, '').trim();  // we emulate the clean title for responseiveness 
-                document.getElementById('playback-duration').innerText = "/" + jsonTimecodeToString(selectedClipData.duration);
-                document.getElementById('playback-behaviour').innerText = selectedClipData.playbackBehavior;
-                updatePlaybackState(socketData.state);  
-                //setSelectedClip(selectedClipData.index);
-                updateTransportButtonState(socketData.state);
+            // in theory we don't have to get playlist data, we can merge it internally
+            fetchPlaylistData().then(() => {
+                selectedClipData = findClipByClipName(socketData.clipName);
+                if (selectedClipData) {
+                    //console.log('Playlist update recieved. Updating playlist.')
+                    //updatePlaylistDOM; //we then refresh the dom
+                    document.getElementById('playback-title').innerText = socketData.clipName.replace(/\[[^\]]*\]/g, '').trim();  // we emulate the clean title for responseiveness 
+                    document.getElementById('playback-duration').innerText = "/" + jsonTimecodeToString(selectedClipData.duration);
+                    document.getElementById('playback-behaviour').innerText = selectedClipData.playbackBehavior;
+                    updatePlaybackState(socketData.state);  
+                    //setSelectedClip(selectedClipData.index);
+                    updateTransportButtonState(socketData.state);
 
-            }
-        });   
+                }
+            });   
         },
         onTimecodeUpdate: (socketData) => {
             const frameRate = Math.round(selectedClipData.fps * 100)/100; //tc lib requires rounded fr
