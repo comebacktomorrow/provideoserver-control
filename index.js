@@ -1,13 +1,4 @@
 //index.js
-const fs = require('fs');
-const path = require('path');
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
-const logger = require('./logger');
-const ProVideoServerController = require('./ProVideoServerController');
-const startInteractiveConsole = require('./Interactive/interactive');
-const startWebServer = require('./REST/server');
-const { updateAllTimers } = require('./ProPresenter/ProPresenterTimers');
 const fs = require("fs");
 const path = require("path");
 const yargs = require("yargs/yargs");
@@ -45,21 +36,7 @@ logger.setLevel(argv.logLevel);
 
 logger.info(`Starting application with log level: ${argv.logLevel}`);
 
-
 const getConfigFilePath = () => {
-    const homeDirectory = process.env.HOME || process.env.USERPROFILE;
-    const documentsPath = path.join(homeDirectory, 'Documents', 'PVSControl.json');
-    const localPath = path.resolve(__dirname, 'PVSControl.json');
-    
-    if (fs.existsSync(documentsPath)) {
-        logger.info('Found config file in documents path');
-        return documentsPath;
-    } else if (fs.existsSync(localPath)) {
-        logger.info('Config file not found in documents path, will local in local directory instead');
-        return localPath;
-    } else {
-        throw new Error('PVSControl.json not found in either Documents folder or local directory.');
-    }
   const homeDirectory = process.env.HOME || process.env.USERPROFILE;
   const documentsPath = path.join(
     homeDirectory,
@@ -87,17 +64,17 @@ const configPath = getConfigFilePath();
 const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 const {
-  CONTROL: { PORT: WEB_PORT },
+  CONTROL: { PORT: WEB_PORT } = {}, // Destructure with default empty object if CONTROL is missing
   PVS: {
     IP_ADDRESS: PVS_IP_ADDRESS,
     PORT: PVS_PORT,
     CHANNEL_NUMBER: PVS_CHANNEL_NUMBER,
     CHANNEL_NAME: PVS_CHANNEL_NAME,
     AUTO_QUEUE_DISABLE: PVS_AUTO_QUEUE,
-  },
-  PRO_PRESENTER: { IP_ADDRESS: PRO_PRESENTER_IP, PORT: PRO_PRESENTER_PORT },
-  TSL_RX: { PORT: TSL_PORT, ADDRESS: TSL_ADDRESS },
-  RAW_TCP: { PORT: TIMER_PORT, IP_ADDRESS: TIMER_IP_ADDRESS, TIMER: TIMER_SELECT},
+  } = {}, // Default empty object if PVS is missing
+  PRO_PRESENTER: { IP_ADDRESS: PRO_PRESENTER_IP, PORT: PRO_PRESENTER_PORT } = {}, // Same for PRO_PRESENTER
+  TSL_RX: { PORT: TSL_PORT, ADDRESS: TSL_ADDRESS } = {}, // Same for TSL_RX
+  RAW_TCP: { PORT: TIMER_PORT, IP_ADDRESS: TIMER_IP_ADDRESS, TIMERS: TIMER_SELECT } = {} // Same for RAW_TCP
 } = config;
 
 const controller = new ProVideoServerController(
@@ -108,7 +85,7 @@ const controller = new ProVideoServerController(
   PVS_AUTO_QUEUE
 );
 
-goUMD(controller, TSL_PORT, TSL_ADDRESS);
+if (config.TSL_RX) { goUMD(controller, TSL_PORT, TSL_ADDRESS)};
 
 // Start the interactive console
 startInteractiveConsole(controller);
@@ -118,7 +95,7 @@ startWebServer(controller, WEB_PORT);
 
 //this is how we're updating the propresenter timers
 setInterval(() => {
-  updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
-  updateTCPTimer(controller, TIMER_IP_ADDRESS, TIMER_PORT, TIMER_SELECT)
+  if (config.PRO_PRESENTER) { updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)};
+  if (config.RAW_TCP) {updateTCPTimer(controller, TIMER_IP_ADDRESS, TIMER_PORT, TIMER_SELECT)};
   //         sendUMDMessage(controller, '127.0.0.1', TSL_PORT, controller);
 }, 1000);
