@@ -47,27 +47,14 @@ function sendTCPTime(time, TCP_HOST, TCP_PORT) {
 async function updateTCPTimer(controller, timer_ip_address, timer_port, timer_select) {
 
     let remainingTimes = [];
-    let filterValue = timer_select;
 
-    const filteredTimerNames = filterValue === 'ALL'
-        ? TIMER_NAMES // If filterValue is "ALL", include all timer names
-        : TIMER_NAMES.filter(timer => {
-            // Include or exclude based on filterValue
-            if (filterValue.startsWith('!')) {
-                // Exclude timer if it matches the filterValue (with '!')
-                return timer !== filterValue.substring(1);
-            } else {
-                // Include timer if it matches the filterValue
-                return timer === filterValue;
-            }
-        });
+    //filter out what values we don't care for based on the data loaded from the config file
+    const filteredTimerNames = TIMER_NAMES.filter(timer => timer_select[timer]);
     
     filteredTimerNames.forEach(timer => {
         let remainingTime = timecodeToSeconds(controller.clocks[timer]);
         remainingTimes.push(remainingTime);
     });
-
-    console.log(controller.clocks)
 
     // Remove zero values
     remainingTimes = remainingTimes.filter(time => time !== 0);

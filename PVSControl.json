@@ -17,8 +17,13 @@
     "ADDRESS": 2
   },
   "RAW_TCP": {
-    "PORT": 54294,
+    "PORT": 13000,
     "IP_ADDRESS": "127.0.0.1",
-    "TIMER": "!remaining"
+    "TIMERS": {
+      "remaining": false,
+      "t1": true,
+      "t2": true,
+      "trt": true
+    }
   }
 }
