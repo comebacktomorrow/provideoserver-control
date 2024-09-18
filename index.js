@@ -17,13 +17,11 @@ const ProVideoServerController = require("./ProVideoServerController");
 const startInteractiveConsole = require("./Interactive/interactive");
 const startWebServer = require("./REST/server");
 const { updateAllTimers } = require("./ProPresenter/ProPresenterTimers");
+const { updateTCPTimer } = require("./RAW_TCP/rawTCP")
 //const { umd } = require('./TSL-UMD/tsl-umd');
-//const { sendUMDMessage } = require('./TSL-UMD/tsl-umd-send'); 
-const goUMD = require('./TSL-UMD/tsl-umd');
 //const { sendUMDMessage } = require('./TSL-UMD/tsl-umd-send');
 const goUMD = require("./TSL-UMD/tsl-umd");
 
-const isPackaged = typeof process.pkg !== 'undefined';
 const isPackaged = typeof process.pkg !== "undefined";
 
 let argv = {};
@@ -86,33 +84,29 @@ const getConfigFilePath = () => {
 };
 
 const configPath = getConfigFilePath();
-const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 const {
-    CONTROL: {
-        PORT: WEB_PORT
-        },
-    PVS: {
-        IP_ADDRESS: PVS_IP_ADDRESS,
-        PORT: PVS_PORT,
-        CHANNEL_NUMBER: PVS_CHANNEL_NUMBER,
-        CHANNEL_NAME: PVS_CHANNEL_NAME,
-        AUTO_QUEUE_DISABLE: PVS_AUTO_QUEUE
-    },
-    PRO_PRESENTER: {
-        IP_ADDRESS: PRO_PRESENTER_IP,
-        PORT: PRO_PRESENTER_PORT
-    },
-    TSL_RX: {
-        PORT: TSL_PORT,
-        ADDRESS: TSL_ADDRESS
-    }
+  CONTROL: { PORT: WEB_PORT },
+  PVS: {
+    IP_ADDRESS: PVS_IP_ADDRESS,
+    PORT: PVS_PORT,
+    CHANNEL_NUMBER: PVS_CHANNEL_NUMBER,
+    CHANNEL_NAME: PVS_CHANNEL_NAME,
+    AUTO_QUEUE_DISABLE: PVS_AUTO_QUEUE,
+  },
+  PRO_PRESENTER: { IP_ADDRESS: PRO_PRESENTER_IP, PORT: PRO_PRESENTER_PORT },
+  TSL_RX: { PORT: TSL_PORT, ADDRESS: TSL_ADDRESS },
+  RAW_TCP: { PORT: TIMER_PORT, IP_ADDRESS: TIMER_IP_ADDRESS, TIMER: TIMER_SELECT},
 } = config;
 
-
-
-const controller = new ProVideoServerController(PVS_IP_ADDRESS, PVS_PORT, PVS_CHANNEL_NUMBER, PVS_CHANNEL_NAME, PVS_AUTO_QUEUE);
+const controller = new ProVideoServerController(
+  PVS_IP_ADDRESS,
+  PVS_PORT,
+  PVS_CHANNEL_NUMBER,
+  PVS_CHANNEL_NAME,
+  PVS_AUTO_QUEUE
+);
 
 goUMD(controller, TSL_PORT, TSL_ADDRESS);
 
@@ -123,8 +117,8 @@ startInteractiveConsole(controller);
 startWebServer(controller, WEB_PORT);
 
 //this is how we're updating the propresenter timers
- setInterval(() => {
-         updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
-//         sendUMDMessage(controller, '127.0.0.1', TSL_PORT, controller);
- }, 1000);
-
+setInterval(() => {
+  updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller);
+  updateTCPTimer(controller, TIMER_IP_ADDRESS, TIMER_PORT, TIMER_SELECT)
+  //         sendUMDMessage(controller, '127.0.0.1', TSL_PORT, controller);
+}, 1000);

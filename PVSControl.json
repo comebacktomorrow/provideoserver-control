@@ -15,5 +15,10 @@
   "TSL_RX": {
     "PORT": 40041,
     "ADDRESS": 2
+  },
+  "RAW_TCP": {
+    "PORT": 54294,
+    "IP_ADDRESS": "127.0.0.1",
+    "TIMER": "!remaining"
   }
 }
