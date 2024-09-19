@@ -8,7 +8,7 @@ const ProVideoServerController = require("./ProVideoServerController");
 const startInteractiveConsole = require("./Interactive/interactive");
 const startWebServer = require("./REST/server");
 const { updateAllTimers } = require("./ProPresenter/ProPresenterTimers");
-const { updateTCPTimer } = require("./RAW_TCP/rawTCP")
+const { updateSocketTimer } = require("./RAW_SOCKET/rawSocket")
 //const { umd } = require('./TSL-UMD/tsl-umd');
 //const { sendUMDMessage } = require('./TSL-UMD/tsl-umd-send');
 const goUMD = require("./TSL-UMD/tsl-umd");
@@ -74,7 +74,7 @@ const {
   } = {}, // Default empty object if PVS is missing
   PRO_PRESENTER: { IP_ADDRESS: PRO_PRESENTER_IP, PORT: PRO_PRESENTER_PORT } = {}, // Same for PRO_PRESENTER
   TSL_RX: { PORT: TSL_PORT, ADDRESS: TSL_ADDRESS } = {}, // Same for TSL_RX
-  RAW_TCP: { PORT: TIMER_PORT, IP_ADDRESS: TIMER_IP_ADDRESS, TIMERS: TIMER_SELECT } = {} // Same for RAW_TCP
+  RAW_SOCKET: { PORT: TIMER_PORT, IP_ADDRESS: TIMER_IP_ADDRESS, TYPE: TIMER_TYPE, TIMERS: TIMER_SELECT } = {} // Same for RAW_TCP
 } = config;
 
 const controller = new ProVideoServerController(
@@ -96,6 +96,6 @@ startWebServer(controller, WEB_PORT);
 //this is how we're updating the propresenter timers
 setInterval(() => {
   if (config.PRO_PRESENTER) { updateAllTimers(PRO_PRESENTER_IP, PRO_PRESENTER_PORT, controller)};
-  if (config.RAW_TCP) {updateTCPTimer(controller, TIMER_IP_ADDRESS, TIMER_PORT, TIMER_SELECT)};
+  if (config.RAW_SOCKET) {updateSocketTimer(controller, TIMER_IP_ADDRESS, TIMER_PORT, TIMER_SELECT, TIMER_TYPE)};
   //         sendUMDMessage(controller, '127.0.0.1', TSL_PORT, controller);
 }, 1000);

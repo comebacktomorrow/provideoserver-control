@@ -16,9 +16,10 @@
     "PORT": 40041,
     "ADDRESS": 2
   },
-  "RAW_TCP": {
+  "RAW_SOCKET": {
     "PORT": 13000,
     "IP_ADDRESS": "127.0.0.1",
+    "TYPE": "UDP",
     "TIMERS": {
       "remaining": false,
       "t1": true,

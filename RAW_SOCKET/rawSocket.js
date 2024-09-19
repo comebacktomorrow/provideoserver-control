@@ -1,5 +1,6 @@
 const logger = require('../logger');
 const net = require('net');
+const dgram = require('dgram'); 
 
 let connectionState = null;
 
@@ -43,8 +44,28 @@ function sendTCPTime(time, TCP_HOST, TCP_PORT) {
     });
 }
 
+// UDP sending function
+function sendUDPTime(time, UDP_HOST, UDP_PORT) {
+    const message = Buffer.from(time.toString());
+    const client = dgram.createSocket('udp4');
+
+    client.send(message, UDP_PORT, UDP_HOST, (err) => {
+        if (err) {
+            logger.error('RAW UDP client error:', err);
+            connectionState = 'error';
+        } else {
+            if (connectionState !== 'connected') {
+                logger.info('RAW UDP sending to ' + UDP_HOST + ":" + UDP_PORT);
+            }
+            connectionState = 'connected';
+            logger.verbose('Data sent to UDP server:', time);
+        }
+        client.close();
+    });
+}
+
 // controller is model, timer is the name of the timer we lock to .. auto follows next LTP (lowest takes precedence?) and none is the same as TRT
-async function updateTCPTimer(controller, timer_ip_address, timer_port, timer_select) {
+async function updateSocketTimer(controller, timer_ip_address, timer_port, timer_select, type = "UDP") {
 
     let remainingTimes = [];
 
@@ -63,10 +84,17 @@ async function updateTCPTimer(controller, timer_ip_address, timer_port, timer_se
     if (remainingTimes.length === 0) {
         remainingTimes = [0]; // If all values get filtered out, we still want a zero
     }
+
+    // Find the lowest remaining time
+    remainingTimes = Math.min(...remainingTimes);
     
-    //send time to socket function
-    if (timer_ip_address){
-        sendTCPTime(parseInt(Math.min(...remainingTimes), 10), timer_ip_address, timer_port);
+     // Send time via TCP or UDP
+     if (timer_ip_address) {
+        if (type === 'TCP') {
+            sendTCPTime(remainingTimes, timer_ip_address, timer_port);
+        } else {
+            sendUDPTime(remainingTimes, timer_ip_address, timer_port);
+        }
     }
     
 }
@@ -79,5 +107,5 @@ function timecodeToSeconds(time) {
 }
 
 module.exports = {
-    updateTCPTimer
+    updateSocketTimer
 };

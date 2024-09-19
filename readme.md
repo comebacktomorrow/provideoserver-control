@@ -17,13 +17,15 @@ This companion application is designed to make the most under-appreciated Renewe
 	 - **Stage display web output** with current time of day and soonest expiring clock. Video time is only shown while the video is playing and is on air. Video will not display video clip time, only TRT. If TRT has been set and has been expired, 00:00 will remain on screen until the video stops playing or is taken off air. If you don't have TSL data, you can set the url stage.html?tally=1 to force it to assume it is on air. You can also use hidetime=1 to hide the time of day clock (or tally=1&hidetime=1 for both).
 	 - **ProPresenter timer integration**.
 		 - ProPresenter timer support looks for "PVS Time Remaining", "PVS Timer 1", PVS Timer 2", and "PVS TRT". It makes no assumptions about priority and order, it leaves that up to you to implement in the stage display output. *Please note, it doesn't free run the timers (ie. play and pause), it updates the timers every second - 'not set' is effectively 0.*
-  - **Raw TCP Timer support**.
-    - Designed to intergrate with other applications that consume TCP data. Value is seconds are passed as an integer, transmitted every second. Clocks transmitted is fully customisable via the PVSControl.json file.
+   - **Raw Socket (TCP\UDP) Timer support**.
+    - Designed to intergrate with other applications that consume socket data. Value is seconds are passed as an integer, transmitted every second. Clocks transmitted is fully customisable via the PVSControl.json file. Default is to transmit all except for remaining time (since TRT is by default set to remaining time)
 
 # Getting running...
 
 To get the application running, download the latest binary and run it on the same machines as PVS.
 This app accesses the PVS Playlist XML file to get its metadata, which provides access to things like frame rate, codec and resolution. 
+
+If you download the source instead, you'll need to install Node 18 and run npm install inside the root directory.
 
 - The web interface can be accessed from http://localhost:port/
 - The Production control screen can be accessed from localhost:port/producer/producer.html
@@ -61,9 +63,10 @@ You can remove PRO_PRESENTER, TSL_RX, and RAW_TCP sections if they aren't releva
         "PORT": 40041,
         "ADDRESS": 2
       },
-      "RAW_TCP": {
+      "RAW_SOCKET": {
         "PORT": 13000,
         "IP_ADDRESS": "127.0.0.1",
+        "TYPE": "UDP"
        "TIMERS": {
           "remaining": false,
           "t1": true,
